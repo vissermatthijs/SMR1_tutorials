@@ -1,0 +1,8 @@
+Symlinking /home/ros-industrial/SMR1/devel/./_setup_util.py
+Symlinking /home/ros-industrial/SMR1/devel/./setup.bash
+Symlinking /home/ros-industrial/SMR1/devel/./setup.zsh
+Symlinking /home/ros-industrial/SMR1/devel/./setup.sh
+Symlinking /home/ros-industrial/SMR1/devel/./env.sh
+Symlinking /home/ros-industrial/SMR1/devel/lib/pkgconfig/catkin_tools_prebuild.pc
+Symlinking /home/ros-industrial/SMR1/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig-version.cmake
+Symlinking /home/ros-industrial/SMR1/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig.cmake

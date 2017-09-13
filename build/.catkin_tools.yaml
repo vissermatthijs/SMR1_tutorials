@@ -1,0 +1,6 @@
+devel_space: /home/ros-industrial/SMR1/devel
+install: false
+install_space: /home/ros-industrial/SMR1/install
+profile: default
+source_space: /home/ros-industrial/SMR1/src
+workspace: /home/ros-industrial/SMR1
