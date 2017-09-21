@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 
     ros::Rate loop_rate(1);
 
-    PLC plc(plc_ip);
+    PLC plc(plc_ip, nh);
 
     while (ros::ok()) {
 

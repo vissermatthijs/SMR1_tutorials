@@ -6,7 +6,7 @@
 #include <iostream>
 #include <ros/ros.h>
 
-PLC::PLC(std::string ip) : rack(0), slot(2) {
+PLC::PLC(std::string ip, ros::NodeHandle& nh) : rack(0), slot(1) {
 
     Client= new TS7Client();
 
@@ -22,7 +22,7 @@ PLC::PLC(std::string ip) : rack(0), slot(2) {
         ROS_INFO("PLC Connection error");
     }
 
-
+ //sensor_pub = nh.advertise<plc::sensor_info>("plc_sensors", 1000);
 }
 
 PLC::~PLC() {
@@ -51,4 +51,33 @@ bool PLC::Check(int Result, const char * function) {
     return Result==0;
 
 
+}
+
+int PLC::getDISensorValue(SENSORS s) {
+
+
+    TS7DataItem item[1];
+    byte EB[1];
+
+    switch(s) {
+        case SENSORS::IR:
+            item[0].Area     =S7AreaPE;
+            item[0].WordLen  =S7WLByte;
+            item[0].DBNumber =0;
+            item[0].Start    =0;
+            item[0].Amount   =1;
+            item[0].pdata    =&EB;
+            break;
+        default:
+            return -1;
+    }
+
+    int res=Client->ReadMultiVars(&item[0],1);
+
+    if (Check(res,"Multiread Vars"))
+    {
+        return item[0].Result;
+    } else {
+        return -1;
+    }
 }
