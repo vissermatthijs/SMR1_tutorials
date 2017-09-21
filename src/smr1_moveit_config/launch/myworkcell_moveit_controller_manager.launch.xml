@@ -4,5 +4,5 @@
     <param name="moveit_controller_manager"
            value="$(arg moveit_controller_manager)"/>
 
-    <rosparam file="$(find myworkcell_moveit_config)/config/controllers.yaml"/>
+    <rosparam file="$(find smr1_moveit_config)/config/controllers.yaml"/>
 </launch>
