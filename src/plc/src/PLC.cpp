@@ -5,6 +5,7 @@
 #include <plc/PLC.h>
 #include <iostream>
 #include <ros/ros.h>
+#include <plc/sensor_info.h>
 
 PLC::PLC(std::string ip, ros::NodeHandle& nh) : rack(0), slot(1) {
 
@@ -22,7 +23,7 @@ PLC::PLC(std::string ip, ros::NodeHandle& nh) : rack(0), slot(1) {
         ROS_INFO("PLC Connection error");
     }
 
- //sensor_pub = nh.advertise<plc::sensor_info>("plc_sensors", 1000);
+    sensor_pub = nh.advertise<plc::sensor_info>("plc_sensors", 1000);
 }
 
 PLC::~PLC() {
@@ -75,4 +76,14 @@ bool PLC::getDISensorValue(SENSORS s) {
     } else {
         return -1;
     }
+}
+
+void PLC::publishSensorData() {
+
+    plc::sensor_info msg;
+
+    byte IR = this->getDISensorValue(SENSORS::IR);
+    msg.ir = static_cast<bool>(IR);
+
+    sensor_pub.publish(msg);
 }

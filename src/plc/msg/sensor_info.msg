@@ -1,1 +1,1 @@
-float64 ir_value
+bool ir

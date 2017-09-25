@@ -22,6 +22,8 @@ public:
 
     bool getDISensorValue(SENSORS s);
 
+    void publishSensorData();
+
     ~PLC();
 
 private:
