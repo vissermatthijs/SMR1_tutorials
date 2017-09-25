@@ -17,6 +17,7 @@ public:
 
     std::string getName() const {return name;}
 
+    void test();
 private:
     const std::string name;
 

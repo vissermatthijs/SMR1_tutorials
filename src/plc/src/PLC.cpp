@@ -31,14 +31,14 @@ PLC::~PLC() {
 
 bool PLC::Check(int Result, const char * function) {
 
-    printf("\n");
+   /* printf("\n");
     printf("+-----------------------------------------------------\n");
     printf("| %s\n",function);
-    printf("+-----------------------------------------------------\n");
+    printf("+-----------------------------------------------------\n"); */
     if (Result==0) {
-        printf("| Result         : OK\n");
+       /* printf("| Result         : OK\n");
         printf("| Execution time : %d ms\n",Client->ExecTime());
-        printf("+-----------------------------------------------------\n");
+        printf("+-----------------------------------------------------\n"); */
     }
     else {
         printf("| ERROR !!! \n");
@@ -53,30 +53,25 @@ bool PLC::Check(int Result, const char * function) {
 
 }
 
-int PLC::getDISensorValue(SENSORS s) {
+bool PLC::getDISensorValue(SENSORS s) {
 
 
-    TS7DataItem item[1];
-    byte EB[1];
+    int start;
+    byte EB;
 
     switch(s) {
         case SENSORS::IR:
-            item[0].Area     =S7AreaPE;
-            item[0].WordLen  =S7WLByte;
-            item[0].DBNumber =0;
-            item[0].Start    =0;
-            item[0].Amount   =1;
-            item[0].pdata    =&EB;
+            start = 0;
             break;
         default:
             return -1;
     }
 
-    int res=Client->ReadMultiVars(&item[0],1);
+    int res=Client->ReadArea(S7AreaPE, 0, start, 1, S7WLByte, &EB);
 
-    if (Check(res,"Multiread Vars"))
+    if (Check(res,"ReadArea"))
     {
-        return item[0].Result;
+        return static_cast<bool>(EB);
     } else {
         return -1;
     }

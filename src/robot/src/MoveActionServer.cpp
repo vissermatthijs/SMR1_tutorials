@@ -19,3 +19,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
 
 }
+
+void MoveActionServer::test() {
+    planner.randomPoses();
+}

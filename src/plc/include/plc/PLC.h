@@ -20,7 +20,7 @@ public:
     TS7CpuInfo getCPUInfo() const;
     TS7CpInfo getCPInfo() const;
 
-    int getDISensorValue(SENSORS s);
+    bool getDISensorValue(SENSORS s);
 
     ~PLC();
 
