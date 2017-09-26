@@ -3,6 +3,7 @@
 //
 
 #include <robot/MoveActionServer.h>
+#include <string>
 
 MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n),
                                                          name("MovePlant"),
@@ -31,5 +32,5 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 }
 
 void MoveActionServer::test() {
-    this->planner.randomPoses();
+    this->planner.manualPose(std::string("plant_test"));
 }
