@@ -21,6 +21,8 @@ public:
     void manualPose(const std::string& pose);
     void manualPose(float x, float y, float z);
 
+    bool plan(float x, float y, float z);
+
 private:
 
     moveit::planning_interface::MoveGroupInterface move_group;

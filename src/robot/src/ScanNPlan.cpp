@@ -45,3 +45,16 @@ void ScanNPlan::manualPose(float x, float y, float z) {
     move_group.setPoseTarget(move_target);
     move_group.move();
 }
+
+bool ScanNPlan::plan(float x, float y, float z) {
+
+    geometry_msgs::Pose move_target;
+    move_target.orientation.w = 1.0;
+    move_target.position.x = x;
+    move_target.position.y = y;
+    move_target.position.z = z;
+
+    move_group.setPoseTarget(move_target);
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    return move_group.plan(my_plan);
+};

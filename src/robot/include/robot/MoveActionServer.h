@@ -22,6 +22,7 @@ private:
     const std::string name;
 
     actionlib::SimpleActionServer<robot::MovePlantAction> as_;
+    robot::MovePlantResult result;
     ScanNPlan planner;
 
     void exec(const robot::MovePlantGoalConstPtr &goal);
