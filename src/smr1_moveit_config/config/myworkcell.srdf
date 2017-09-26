@@ -37,18 +37,45 @@
         <joint name="wrist_2_joint" value="-0.8852" />
         <joint name="wrist_3_joint" value="0.7116" />
     </group_state>
+    <group_state name="tool_test1" group="manipulator">
+        <joint name="elbow_joint" value="0" />
+        <joint name="shoulder_lift_joint" value="-0.7116" />
+        <joint name="shoulder_pan_joint" value="-0.1215" />
+        <joint name="wrist_1_joint" value="0" />
+        <joint name="wrist_2_joint" value="-0.0174" />
+        <joint name="wrist_3_joint" value="-2.2737" />
+    </group_state>
+    <group_state name="tool_test2" group="manipulator">
+        <joint name="elbow_joint" value="0" />
+        <joint name="shoulder_lift_joint" value="-0.7116" />
+        <joint name="shoulder_pan_joint" value="-0.1215" />
+        <joint name="wrist_1_joint" value="0" />
+        <joint name="wrist_2_joint" value="-0.0174" />
+        <joint name="wrist_3_joint" value="0.0868" />
+    </group_state>
+    <group_state name="tool_test3" group="manipulator">
+        <joint name="elbow_joint" value="0" />
+        <joint name="shoulder_lift_joint" value="-0.7116" />
+        <joint name="shoulder_pan_joint" value="-0.1215" />
+        <joint name="wrist_1_joint" value="0.0868" />
+        <joint name="wrist_2_joint" value="0.7463" />
+        <joint name="wrist_3_joint" value="2.5167" />
+    </group_state>
+    <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
+    <end_effector name="eoat" parent_link="tool0" group="manipulator" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="FixedBase" type="fixed" parent_frame="world" child_link="world" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="base_link" link2="env" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="shoulder_link" reason="Adjacent" />
+    <disable_collisions link1="ee_link" link2="eoat" reason="Default" />
     <disable_collisions link1="ee_link" link2="wrist_1_link" reason="Never" />
     <disable_collisions link1="ee_link" link2="wrist_2_link" reason="Never" />
     <disable_collisions link1="ee_link" link2="wrist_3_link" reason="Adjacent" />
-    <disable_collisions link1="env" link2="forearm_link" reason="Default" />
-    <disable_collisions link1="env" link2="shoulder_link" reason="Default" />
-    <disable_collisions link1="env" link2="upper_arm_link" reason="Default" />
-    <disable_collisions link1="env" link2="wrist_1_link" reason="Default" />
+    <disable_collisions link1="env" link2="shoulder_link" reason="Never" />
+    <disable_collisions link1="eoat" link2="wrist_1_link" reason="Never" />
+    <disable_collisions link1="eoat" link2="wrist_2_link" reason="Never" />
+    <disable_collisions link1="eoat" link2="wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="forearm_link" link2="upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="forearm_link" link2="wrist_1_link" reason="Adjacent" />
     <disable_collisions link1="shoulder_link" link2="upper_arm_link" reason="Adjacent" />

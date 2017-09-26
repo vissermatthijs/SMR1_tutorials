@@ -10,6 +10,12 @@
         <origin xyz="-0.85 -0.42 1.55" rpy="0 0 0"/>
     </joint>
 
+    <joint name="eoat_to_tool0" type="fixed">
+        <parent link="tool0" />
+        <child link="eoat" />
+        <origin xyz="0 0 0" rpy="0 0 -2.36"/>
+    </joint>
+
     <link name="world"/>
     <link name="env" >
         <visual>
@@ -17,6 +23,14 @@
                 <mesh filename="package://smr1_moveit_config/urdf/smrsetup.stl"/>
             </geometry>
             <origin xyz="0 0 0" rpy="3.14 0 3.14" />
+        </visual>
+    </link>
+
+    <link name="eoat">
+        <visual>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/eoat.stl" />
+            </geometry>
         </visual>
     </link>
 
