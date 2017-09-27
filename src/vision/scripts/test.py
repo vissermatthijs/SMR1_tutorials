@@ -31,6 +31,11 @@ args = options()
 
 def back_for_ground_sub(img,sliders):
     stop = 0
+    sat_thresh = 80
+    blue_thresh = 135
+    green_magenta_dark_thresh = 117
+    green_magenta_light_thresh = 180
+    blue_yellow_thresh = 128
     def nothing(x):
         pass
 
