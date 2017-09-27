@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+#Pipeline starts by importing necessary packages, and defining user inputs
 import sys, traceback
 import cv2
 import numpy as np
@@ -21,39 +22,25 @@ def options():
     args = parser.parse_args()
     return args
 
-def nothing(x):
-    pass
-
-#cv2.namedWindow('image')
-#cv2.createTrackbar('R','image',0,255,nothing)
-#cv2.createTrackbar('G','image',0,255,nothing)
-#cv2.createTrackbar('B','image',0,255,nothing)
-
-
 # Read image
 img, path, filename = pcv.readimage("yucca2.JPG")
 
+# Pipeline step
 device = 0
 
-# get current positions of four trackbars
-R = cv2.getTrackbarPos('R', 'image')
-G = cv2.getTrackbarPos('G', 'image')
-B = cv2.getTrackbarPos('B', 'image')
 # Convert RGB to HSV and extract the Saturation channel
+# Extract the light and dark form the image
 device, s = pcv.rgb2gray_hsv(img, 's', device)
 device, s_thresh = pcv.binary_threshold(s, 120, 255, 'light', device)
-#mine testdevice, s_thresh = pcv.binary_threshold(s, r, g, 'light', device)
-
-# Median Filter
 device, s_mblur = pcv.median_blur(s_thresh, 5, device)
 device, s_cnt = pcv.median_blur(s_thresh, 5, device)
 
-device, b = pcv.rgb2gray_lab(img, 'b', device)
-
+# Convert RGB to LAB and extract the Blue channel
 # Threshold the blue image
+device, b = pcv.rgb2gray_lab(img, 'b', device)
 device, b_thresh = pcv.binary_threshold(b, 137, 255, 'light', device)
 device, b_cnt = pcv.binary_threshold(b, 140, 255, 'light', device)
-device, bs = pcv.logical_or(b_thresh, b_cnt, device)
+device, bs = pcv.logical_or(s_mblur, b_cnt, device)
 
 device, masked = pcv.apply_mask(img, bs, 'white', device)
 
