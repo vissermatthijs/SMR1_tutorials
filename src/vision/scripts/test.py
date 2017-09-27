@@ -37,22 +37,24 @@ device, s_cnt = pcv.median_blur(s_thresh, 5, device)
 
 # Convert RGB to LAB and extract the Blue channel
 # Threshold the blue image
+# Combine the threshed saturation and the blue theshed image with the logical or
 device, b = pcv.rgb2gray_lab(img, 'b', device)
 device, b_thresh = pcv.binary_threshold(b, 137, 255, 'light', device)
 device, b_cnt = pcv.binary_threshold(b, 140, 255, 'light', device)
 device, bs = pcv.logical_or(s_mblur, b_cnt, device)
-
+# Mask the original image with the theshed combination of the blue&saturation
 device, masked = pcv.apply_mask(img, bs, 'white', device)
 
 # Convert RGB to LAB and extract the Green-Magenta and Blue-Yellow channels
 device, masked_a = pcv.rgb2gray_lab(masked, 'a', device)
 device, masked_b = pcv.rgb2gray_lab(masked, 'b', device)
 
-
-
+# Focus on capturing the plant from the masked image 'masked'
+# Extract plant green-magenta and blue-yellow channels
+# Channels are threshold to cap different portions of the plant
 # Threshold the green-magenta and blue images
+# Images joined together
 #device, maskeda_thresh = pcv.binary_threshold(masked_a, 115, 255, 'dark', device)
-#print(R,G,B)
 device, maskeda_thresh = pcv.binary_threshold(masked_a, 125, 255, 'dark', device) #Original 115 New 125
 device, maskeda_thresh1 = pcv.binary_threshold(masked_a, 170, 255, 'light', device)#Original 135 New 170
 device, maskedb_thresh = pcv.binary_threshold(masked_b, 165, 255, 'light', device)# Original 150`, New 165
