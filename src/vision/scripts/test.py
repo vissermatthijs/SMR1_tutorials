@@ -24,7 +24,8 @@ def options():
 
 
 # Read image
-img, path, filename = pcv.readimage("yucca2.JPG")
+img, path, filename = pcv.readimage("yucca3.jpg")
+img = cv2.resize(img, (0,0), fx= 0.2, fy = 0.2)
 args = options()
 
 
@@ -34,33 +35,31 @@ def back_for_ground_sub(img,sliders):
         pass
 
     if sliders == True:
-        Saturation = np.zeros((300, 512, 3), np.uint8)
-        Blue = np.zeros((300, 512, 3), np.uint8)
-        Green_magenta_dark = np.zeros((300, 512, 3), np.uint8)
-        Green_magenta_light = np.zeros((300, 512, 3), np.uint8)
-        Blue_yellow_light = np.zeros((300, 512, 3), np.uint8)
-        Stop_ = np.zeros((300, 512, 3), np.uint8)
 
-        cv2.namedWindow('Saturation')
-        cv2.namedWindow('Blue')
-        cv2.namedWindow('Green_magenta_dark')
-        cv2.namedWindow('Green_magenta_light')
-        cv2.namedWindow('Blue_yellow_light')
+
+        Stop = np.zeros((100, 512, 3), np.uint8)
+
+        cv2.namedWindow('Saturation',cv2.WINDOW_NORMAL)
+        cv2.namedWindow('Blue',cv2.WINDOW_NORMAL)
+        cv2.namedWindow('Green_magenta_dark',cv2.WINDOW_NORMAL)
+        cv2.namedWindow('Green_magenta_light',cv2.WINDOW_NORMAL)
+        cv2.namedWindow('Blue_yellow_light',cv2.WINDOW_NORMAL)
         cv2.namedWindow('Stop')
-        cv2.createTrackbar('sat_thresh', 'Saturation', 120, 255, nothing)
-        cv2.createTrackbar('blue_thresh', 'Blue', 137, 255, nothing)
-        cv2.createTrackbar('green_magenta_dark_thresh', 'Green_magenta_dark', 125, 255, nothing)
-        cv2.createTrackbar('green_magenta_light_thresh', 'Green_magenta_light', 170, 255, nothing)
-        cv2.createTrackbar('blue_yellow_thresh', 'Blue_yellow_light', 165, 255, nothing)
+        cv2.createTrackbar('sat_thresh', 'Saturation', 85, 255, nothing)
+        cv2.createTrackbar('blue_thresh', 'Blue', 135, 255, nothing)
+        cv2.createTrackbar('green_magenta_dark_thresh', 'Green_magenta_dark', 117, 255, nothing)
+        cv2.createTrackbar('green_magenta_light_thresh', 'Green_magenta_light', 180, 255, nothing)
+        cv2.createTrackbar('blue_yellow_thresh', 'Blue_yellow_light', 128, 255, nothing)
         cv2.createTrackbar('stop','Stop',0,1,nothing)
     while(stop == 0):
+
         if sliders == True:
             # get current positions of five trackbars
             sat_thresh = cv2.getTrackbarPos('sat_thresh', 'Saturation')
             blue_thresh = cv2.getTrackbarPos('blue_thresh','Blue')
-            green_magenta_dark_thresh = cv2.getTrackbarPos('green_magenta_dark_tresh', 'Green_magenta_dark')
-            green_magenta_light_thresh = cv2.getTrackbarPos('green_magenta_light_tresh', 'Green_magenta_light')
-            blue_yellow_thresh = cv2.getTrackbarPos('blue_yellow_tresh', 'Blue_yellow_light')
+            green_magenta_dark_thresh = cv2.getTrackbarPos('green_magenta_dark_thresh', 'Green_magenta_dark')
+            green_magenta_light_thresh = cv2.getTrackbarPos('green_magenta_light_thresh', 'Green_magenta_light')
+            blue_yellow_thresh = cv2.getTrackbarPos('blue_yellow_thresh', 'Blue_yellow_light')
 
         # Pipeline step
         device = 0
@@ -76,7 +75,9 @@ def back_for_ground_sub(img,sliders):
         # Combine the threshed saturation and the blue theshed image with the logical or
         device, b = pcv.rgb2gray_lab(img, 'b', device)
         device, b_thresh = pcv.binary_threshold(b, blue_thresh, 255, 'light', device)
-        device, b_cnt = pcv.binary_threshold(b, 140, 255, 'light', device)
+        device, b_cnt = pcv.binary_threshold(b, blue_thresh, 255, 'light', device)
+        device, b_cnt_2 = pcv.binary_threshold(b, 135, 255, 'light', device)
+
         device, bs = pcv.logical_or(s_mblur, b_cnt, device)
         # Mask the original image with the theshed combination of the blue&saturation
         device, masked = pcv.apply_mask(img, bs, 'white', device)
@@ -94,31 +95,47 @@ def back_for_ground_sub(img,sliders):
         device, maskeda_thresh = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark', device) #Original 115 New 125
         device, maskeda_thresh1 = pcv.binary_threshold(masked_a, green_magenta_light_thresh, 255, 'light', device)#Original 135 New 170
         device, maskedb_thresh = pcv.binary_threshold(masked_b, blue_yellow_thresh, 255, 'light', device)# Original 150`, New 165
+        device, maskeda_thresh2 = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark', device) #Original 115 New 125
 
         # Join the thresholded saturation and blue-yellow images (OR)
         device, ab1 = pcv.logical_or(maskeda_thresh, maskedb_thresh, device)
         device, ab = pcv.logical_or(maskeda_thresh1, ab1, device)
         device, ab_cnt = pcv.logical_or(maskeda_thresh1, ab1, device)
-
+        device, ab_cnt_2 = pcv.logical_and(b_cnt_2,maskeda_thresh2, device)
         # Fill small objects
-        device, ab_fill = pcv.fill(ab, ab_cnt, 120, device)#Original 200 New: 120
+        device, ab_fill = pcv.fill(ab, ab_cnt, 200, device)#Original 200 New: 120
 
         # Apply mask (for vis images, mask_color=white)
         device, masked2 = pcv.apply_mask(masked, ab_fill, 'white', device)
+        device, masked3 = pcv.apply_mask(masked, ab_cnt_2, 'white', device)
 
 
 
         if sliders == True:
             stop = cv2.getTrackbarPos('stop', 'Stop')
-            cv2.imshow('Saturion_tresh',Saturation)
-            cv2.imshow('Blue_thresh',Blue)
-            cv2.imshow('Green_magenta_dark',Green_magenta_dark)
-            cv2.imshow('Green_magenta_light',Green_magenta_light)
-            cv2.imshow('Yellow_blue',Blue_yellow_light)
+
+            cv2.imshow('Stop',Stop)
+            cv2.imshow('Saturation',s_thresh)
+            cv2.imshow('Blue',b_thresh)
+            cv2.imshow('Green_magenta_dark',maskeda_thresh)
+            cv2.imshow('Green_magenta_light',maskeda_thresh1)
+            cv2.imshow('Blue_yellow_light',maskedb_thresh)
+            cv2.imshow('Mask',masked)
+            cv2.imshow('Mask2',masked2)
+            cv2.imshow('Mask3',masked3)
+            cv2.imshow('masked_a',masked_a)
+            cv2.imshow('masked_b',masked_b)
+            cv2.imshow('fill',ab_fill)
+            cv2.imshow('ab_cnt', ab)
+            cv2.imshow('ab1',ab1)
+            cv2.imshow('ab_cnt2',ab_cnt_2)
+            k = cv2.waitKey(1) & 0xFF
+            if k == 27:
+                break
+
         else:
             stop = 1
-        print('1')
-    return masked2, ab_fill, device
+    return masked3, ab_fill, device
 masked2, ab_fill, device = back_for_ground_sub(img, True)
 # Identify objects
 device, id_objects, obj_hierarchy = pcv.find_objects(masked2, ab_fill, device)
@@ -142,6 +159,9 @@ device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(img, a
 # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
 device, color_header, color_data, color_img = pcv.analyze_color(img, args.image, kept_mask, 256, device, False,'all', 'v', 'img', 300,False)
 
+#cv2.imshow('shape',shape_img)
+#cv2.imshow('color',color_img)
+#cv2.imshow('boundry',boundary_img1)
 #Starting skeletoning----------------------------------------------------
 print("Plant extracton done-----------------------------------------------------------------------------------Starting skeletoning")
 size = np.size(mask)
