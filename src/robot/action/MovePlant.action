@@ -5,7 +5,7 @@ float64 y
 float64 z
 ---
 #result definition
-int32[] sequence
+bool sequence
 ---
 #feedback
 int32[] sequence
