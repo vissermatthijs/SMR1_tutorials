@@ -23,9 +23,7 @@ def options():
     args = parser.parse_args()
     return args
 
-# Read image
-img, path, filename = pcv.readimage("yucca3.jpg")
-img = cv2.resize(img, (0,0), fx= 0.2, fy = 0.2)
+
 
 
 
@@ -117,14 +115,13 @@ def back_for_ground_sub(img,sliders):
         # Identify objects
         device, id_objects, obj_hierarchy = pcv.find_objects(masked2, ab_fill, device)
         # Define ROI
-        device, roi1, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, None, 'default', debug, True, 550, 0, -500, -1900)
-        device, roi, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, roi=None, roi_input='default', debug="print",adjust=True, x_adj=0, y_adj=0, w_adj=0, h_adj=-925)
+        device, roi1, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, roi=None, roi_input='default', debug="plot",adjust=True, x_adj=100, y_adj=50, w_adj=-150, h_adj=-50)
 
         # Decide which objects to keep
-        device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(img, 'partial', roi1, roi_hierarchy,id_objects, obj_hierarchy, device)
+        device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(img, 'partial', roi1, roi_hierarchy,id_objects, obj_hierarchy, device, debug = "plot")
 
         # Object combine kept objects
-        device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device)
+        device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug= "plot")
         # Plant extracton done-----------------------------------------------------------------------------------
 
 
@@ -159,6 +156,9 @@ def back_for_ground_sub(img,sliders):
     k = cv2.waitKey(1) & 0xFF
     return device, ab_fill, masked2
 
+# Read image
+img, path, filename = pcv.readimage("yucca3.jpg")
+img = cv2.resize(img, (0,0), fx= 0.2, fy = 0.2)
 
 device, ab_fill, masked2 = back_for_ground_sub(img, True)
 
