@@ -7,6 +7,7 @@ import numpy as np
 import argparse
 import string
 import plantcv as pcv
+from matplotlib import pyplot as plt
 
 # test comment
 
@@ -17,21 +18,22 @@ def options():
     parser.add_argument("-i", "--image", help="Input image file.", required=False)
     parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=False)
     parser.add_argument("-r","--result", help="result file.", required= False )
-    parser.add_argument("-w","--writeimg", help="write out images.", default=False)
-    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default=None)
+    parser.add_argument("-w","--writeimg", help="write out images.", default=True)
+    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.")
     args = parser.parse_args()
     return args
-
 
 # Read image
 img, path, filename = pcv.readimage("yucca3.jpg")
 img = cv2.resize(img, (0,0), fx= 0.2, fy = 0.2)
-args = options()
+
 
 
 def back_for_ground_sub(img,sliders):
+    args = options()
+    debug = args.debug
     stop = 0
-    sat_thresh = 80
+    sat_thresh = 85
     blue_thresh = 135
     green_magenta_dark_thresh = 117
     green_magenta_light_thresh = 180
@@ -43,7 +45,6 @@ def back_for_ground_sub(img,sliders):
 
 
         Stop = np.zeros((100, 512, 3), np.uint8)
-
         cv2.namedWindow('Saturation',cv2.WINDOW_NORMAL)
         cv2.namedWindow('Blue',cv2.WINDOW_NORMAL)
         cv2.namedWindow('Green_magenta_dark',cv2.WINDOW_NORMAL)
@@ -97,7 +98,7 @@ def back_for_ground_sub(img,sliders):
         # Threshold the green-magenta and blue images
         # Images joined together
         #device, maskeda_thresh = pcv.binary_threshold(masked_a, 115, 255, 'dark', device)
-        device, maskeda_thresh = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark', device) #Original 115 New 125
+        device, maskeda_thresh = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark', device, debug= 'print') #Original 115 New 125
         device, maskeda_thresh1 = pcv.binary_threshold(masked_a, green_magenta_light_thresh, 255, 'light', device)#Original 135 New 170
         device, maskedb_thresh = pcv.binary_threshold(masked_b, blue_yellow_thresh, 255, 'light', device)# Original 150`, New 165
         device, maskeda_thresh2 = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark', device) #Original 115 New 125
@@ -113,12 +114,24 @@ def back_for_ground_sub(img,sliders):
         # Apply mask (for vis images, mask_color=white)
         device, masked2 = pcv.apply_mask(masked, ab_fill, 'white', device)
         device, masked3 = pcv.apply_mask(masked, ab_cnt_2, 'white', device)
+        # Identify objects
+        device, id_objects, obj_hierarchy = pcv.find_objects(masked2, ab_fill, device)
+        # Define ROI
+        device, roi1, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, None, 'default', debug, True, 550, 0, -500, -1900)
+        device, roi, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, roi=None, roi_input='default', debug="print",adjust=True, x_adj=0, y_adj=0, w_adj=0, h_adj=-925)
 
+        # Decide which objects to keep
+        device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(img, 'partial', roi1, roi_hierarchy,id_objects, obj_hierarchy, device)
+
+        # Object combine kept objects
+        device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device)
+        # Plant extracton done-----------------------------------------------------------------------------------
 
 
         if sliders == True:
-            stop = cv2.getTrackbarPos('stop', 'Stop')
 
+
+            stop = cv2.getTrackbarPos('stop', 'Stop')
             cv2.imshow('Stop',Stop)
             cv2.imshow('Saturation',s_thresh)
             cv2.imshow('Blue',b_thresh)
@@ -134,46 +147,41 @@ def back_for_ground_sub(img,sliders):
             cv2.imshow('ab_cnt', ab)
             cv2.imshow('ab1',ab1)
             cv2.imshow('ab_cnt2',ab_cnt_2)
+
             k = cv2.waitKey(1) & 0xFF
             if k == 27:
                 break
 
         else:
             stop = 1
-    return masked3, ab_fill, device
-masked2, ab_fill, device = back_for_ground_sub(img, True)
-# Identify objects
-device, id_objects, obj_hierarchy = pcv.find_objects(masked2, ab_fill, device)
-# Define ROI
-device, roi1, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, None, 'default',None, True, 100, 200,-300, -250)
+    print("1")
+    cv2.imshow('masked',masked2)
+    k = cv2.waitKey(1) & 0xFF
+    return device, ab_fill, masked2
 
-# Decide which objects to keep
-device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(img, 'partial', roi1, roi_hierarchy,id_objects, obj_hierarchy, device)
 
-# Object combine kept objects
-device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device)
-
-#Plant extracton done-----------------------------------------------------------------------------------
+device, ab_fill, masked2 = back_for_ground_sub(img, True)
 
 # Find shape properties, output shape image (optional)
-device, shape_header, shape_data, shape_img = pcv.analyze_object(img, args.image, obj, mask, device,False)
+#device, shape_header, shape_data, shape_img = pcv.analyze_object(img, args.image, obj, mask, device,False)
 
 # Shape properties relative to user boundary line (optional)
-device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(img, args.image, obj, mask, 1680, False)
+#device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(img, args.image, obj, mask, 1680, False)
 
 # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
-device, color_header, color_data, color_img = pcv.analyze_color(img, args.image, kept_mask, 256, device, False,'all', 'v', 'img', 300,False)
-
+#device, color_header, color_data, color_img = pcv.analyze_color(img, args.image, kept_mask, 256, device, False,'all', 'v', 'img', 300,False)
+#plt.plot(shape_img)
+#plt.show()
 #cv2.imshow('shape',shape_img)
 #cv2.imshow('color',color_img)
 #cv2.imshow('boundry',boundary_img1)
 #Starting skeletoning----------------------------------------------------
 print("Plant extracton done-----------------------------------------------------------------------------------Starting skeletoning")
-size = np.size(mask)
+size = np.size(masked2)
 
-skel = np.zeros(mask.shape,np.uint8)
+skel = np.zeros(masked2.shape,np.uint8)
 
-ret,mask_thresh = cv2.threshold(mask,127,255,0)
+ret,mask_thresh = cv2.threshold(masked2,127,255,0)
 element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
 print(element)
 
