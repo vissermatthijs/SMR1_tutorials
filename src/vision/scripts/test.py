@@ -1,13 +1,11 @@
 #!/usr/bin/python
 
-# Pipeline starts by importing necessary packages, and defining user inputs
-import sys, traceback
-import cv2
-import numpy as np
 import argparse
-import string
+import numpy as np
+
+# Pipeline starts by importing necessary packages, and defining user inputs
+import cv2
 import plantcv as pcv
-from matplotlib import pyplot as plt
 
 
 # test comment
@@ -186,10 +184,10 @@ print(watershed_data)
 # Find shape properties, output shape image (optional)
 device, shape_header, shape_data, shape_img = pcv.analyze_object(img, "Yucca", obj, masked2, device, debug = "plot")
 
-    # Shape properties relative to user boundary line (optional)
+# Shape properties relative to user boundary line (optional)
 device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(img, "Yucca", obj, masked2, 1680, device, debug = "plot")
 
-    # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
+# Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
 #device, color_header, color_data, color_img = pcv.analyze_color(img, "Yucca", ma, 256, device, debug = "plot", 'all', 'v', 'img', 300, args.outdir + '/' + filename)
 
 # Starting skeletoning----------------------------------------------------
