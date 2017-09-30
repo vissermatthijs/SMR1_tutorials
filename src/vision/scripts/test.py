@@ -14,11 +14,11 @@ import plantcv as pcv
 ### Parse command-line arguments
 def options():
     parser = argparse.ArgumentParser(description="Imaging processing with opencv")
-    parser.add_argument("-i", "--image", help="Input image file.", required=False)
-    parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=False)
+    parser.add_argument("-i", "--image", help="Input image file.", required=True)
+    parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=True)
     parser.add_argument("-r", "--result", help="result file.", required=False)
     parser.add_argument("-w", "--writeimg", help="write out images.", default=True)
-    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.")
+    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default='print')
     args = parser.parse_args()
     return args
 
@@ -65,7 +65,8 @@ def back_for_ground_sub(img, sliders):
         # Convert RGB to HSV and extract the Saturation channel
         # Extract the light and dark form the image
         device, s = pcv.rgb2gray_hsv(img, 's', device)
-        device, s_thresh = pcv.binary_threshold(s, sat_thresh, 255, 'light', device)
+        # device, s_thresh = pcv.binary_threshold(s, sat_thresh, 255, 'light', device)
+        device, s_thresh = pcv.otsu_auto_threshold(s, 255, 'light', device, debug="plot")
         device, s_mblur = pcv.median_blur(s_thresh, 5, device)
         device, s_cnt = pcv.median_blur(s_thresh, 5, device)
 
@@ -73,13 +74,13 @@ def back_for_ground_sub(img, sliders):
         # Threshold the blue image
         # Combine the threshed saturation and the blue theshed image with the logical or
         device, b = pcv.rgb2gray_lab(img, 'b', device)
-        device, b_thresh = pcv.binary_threshold(b, blue_thresh, 255, 'light', device)
-        device, b_cnt = pcv.binary_threshold(b, blue_thresh, 255, 'light', device)
-        device, b_cnt_2 = pcv.binary_threshold(b, 135, 255, 'light', device)
+        device, b_thresh = pcv.otsu_auto_threshold(b, 255, 'light', device, debug="plot")
+        device, b_cnt = pcv.otsu_auto_threshold(b, 255, 'light', device, debug="plot")
+        device, b_cnt_2 = pcv.binary_threshold(b, 135, 255, 'light', device, debug="plot")
 
         device, bs = pcv.logical_or(s_mblur, b_cnt, device)
         # Mask the original image with the theshed combination of the blue&saturation
-        device, masked = pcv.apply_mask(img, bs, 'white', device)
+        device, masked = pcv.apply_mask(img, bs, 'white', device, debug="plot")
 
         # Convert RGB to LAB and extract the Green-Magenta and Blue-Yellow channels
         device, masked_a = pcv.rgb2gray_lab(masked, 'a', device)
@@ -92,27 +93,27 @@ def back_for_ground_sub(img, sliders):
         # Images joined together
         # device, maskeda_thresh = pcv.binary_threshold(masked_a, 115, 255, 'dark', device)
         device, maskeda_thresh = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark', device,
-                                                      debug='print')  # Original 115 New 125
+                                                      debug="plot")  # Original 115 New 125
         device, maskeda_thresh1 = pcv.binary_threshold(masked_a, green_magenta_light_thresh, 255, 'light',
-                                                       device)  # Original 135 New 170
+                                                       device, debug="plot")  # Original 135 New 170
         device, maskedb_thresh = pcv.binary_threshold(masked_b, blue_yellow_thresh, 255, 'light',
-                                                      device)  # Original 150`, New 165
+                                                      device, debug="plot")  # Original 150`, New 165
         device, maskeda_thresh2 = pcv.binary_threshold(masked_a, green_magenta_dark_thresh, 255, 'dark',
-                                                       device)  # Original 115 New 125
+                                                       device, debug="plot")  # Original 115 New 125
 
         # Join the thresholded saturation and blue-yellow images (OR)
-        device, ab1 = pcv.logical_or(maskeda_thresh, maskedb_thresh, device)
-        device, ab = pcv.logical_or(maskeda_thresh1, ab1, device)
-        device, ab_cnt = pcv.logical_or(maskeda_thresh1, ab1, device)
-        device, ab_cnt_2 = pcv.logical_and(b_cnt_2, maskeda_thresh2, device)
+        device, ab1 = pcv.logical_or(maskeda_thresh, maskedb_thresh, device, debug="plot")
+        device, ab = pcv.logical_or(maskeda_thresh1, ab1, device, debug="plot")
+        device, ab_cnt = pcv.logical_or(maskeda_thresh1, ab1, device, debug="plot")
+        device, ab_cnt_2 = pcv.logical_and(b_cnt_2, maskeda_thresh2, device, debug="plot")
         # Fill small objects
-        device, ab_fill = pcv.fill(ab, ab_cnt, 200, device)  # Original 200 New: 120
+        device, ab_fill = pcv.fill(ab, ab_cnt, 200, device, debug="plot")  # Original 200 New: 120
 
         # Apply mask (for vis images, mask_color=white)
-        device, masked2 = pcv.apply_mask(masked, ab_fill, 'white', device)
-        device, masked3 = pcv.apply_mask(masked, ab_cnt_2, 'white', device)
+        device, masked2 = pcv.apply_mask(masked, ab_fill, 'white', device, debug="plot")
+        device, masked3 = pcv.apply_mask(masked, ab_cnt_2, 'white', device, debug="plot")
         # Identify objects
-        device, id_objects, obj_hierarchy = pcv.find_objects(masked2, ab_fill, device)
+        device, id_objects, obj_hierarchy = pcv.find_objects(masked2, ab_fill, device, debug="plot")
         # Define ROI
 
         # Plant extracton done-----------------------------------------------------------------------------------
@@ -143,35 +144,45 @@ def back_for_ground_sub(img, sliders):
         else:
             stop = 1
     device, roi1, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, roi=None, roi_input='default',
-                                                 debug="plot", adjust=True, x_adj=100, y_adj=50, w_adj=-150,
+                                                 debug=False, adjust=True, x_adj=100, y_adj=50, w_adj=-150,
                                                  h_adj=-50)
 
     # Decide which objects to keep
     device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(img, 'partial', roi1, roi_hierarchy,
                                                                            id_objects, obj_hierarchy, device,
-                                                                           debug="plot")
+                                                                           debug=False)
 
     # Object combine kept objects
-    device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug="plot")
+    device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug=False)
     return device, ab_fill, mask, obj
 
+
+### Main pipeline
+def main():
+    # Get options
+    args = options()
+
+    # Read image
+    img, path, filename = pcv.readimage(args.image)
+
+    # Pipeline step
+    device = 0
 
 # Read image
 img, path, filename = pcv.readimage("yucca3.jpg")
 img = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
 
 device, ab_fill, masked2,obj = back_for_ground_sub(img, False)
+device = 1
+# obj, win, thresh, sep, img, device, debug=None
 
+device, list_of_acute_points = pcv.acute_vertex(obj, 30, 90, 50, img, device, debug='plot')
 # Segment image with watershed function
-device, watershed_header, watershed_data,analysis_images=pcv.watershed_segmentation(device, img,masked2,10,'./examples',debug='plot')
+# device, watershed_header, watershed_data,analysis_images=pcv.watershed_segmentation(device, img,masked2,10,'./examples',debug=False)
 
-print(watershed_header)
-print(watershed_data)
-# Find shape properties, output shape image (optional)
-# device, shape_header, shape_data, shape_img = pcv.analyze_object(img, args.image, obj, mask, device,False)
+# print(watershed_header)
+#print(watershed_data)
 
-# Shape properties relative to user boundary line (optional)
-# device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(img, args.image, obj, mask, 1680, False)
 
 # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
 # device, color_header, color_data, color_img = pcv.analyze_color(img, args.image, kept_mask, 256, device, False,'all', 'v', 'img', 300,False)
@@ -193,11 +204,11 @@ device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(img, "
 # Starting skeletoning----------------------------------------------------
 print(
 "Plant extracton done-----------------------------------------------------------------------------------Starting skeletoning")
+
 size = np.size(masked2)
 
 skel = np.zeros(masked2.shape, np.uint8)
-
-ret, mask_thresh = cv2.threshold(masked2, 127, 255, 0)
+#ret, mask_thresh = cv2.threshold(masked2, 127, 255, 0)
 element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
 print(element)
 
@@ -205,15 +216,13 @@ done = False
 print(size)
 while (not done):
 
-    eroded = cv2.erode(mask_thresh, element)
-
+    eroded = cv2.erode(masked2, element)
     temp = cv2.dilate(eroded, element)
 
-    temp = cv2.subtract(mask_thresh, temp)
+    temp = cv2.subtract(masked2, temp)
     skel = cv2.bitwise_or(skel, temp)
-    mask_thresh = eroded.copy()
-
-    zeros = size - cv2.countNonZero(mask_thresh)
+    masked2 = eroded.copy()
+    zeros = size - cv2.countNonZero(masked2)
     print(zeros)
     if zeros == size:
         done = True
@@ -231,8 +240,11 @@ for x1,y1,x2,y2 in lines[0]:
     cv2.line(masked2,(x1,y1),(x2,y2),(0,0,255),2)
 """
 
-lines = cv2.HoughLines(image=skel, rho=1, theta=np.pi / 180, threshold=100, srn=0, stn=0)
-
+lines = cv2.HoughLinesP(image=skel, rho=0.02, theta=np.pi / 500, threshold=10, lines=np.array([]), minLineLength=30,
+                        maxLineGap=10)
+for x1, y1, x2, y2 in lines[0]:
+    cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+""" 
 for rho, theta in lines[0]:
     a = np.cos(theta)
     b = np.sin(theta)
@@ -244,7 +256,7 @@ for rho, theta in lines[0]:
     y2 = int(y0 - 1000 * (a))
 
     cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-
+"""
 print("---------------Visualizing everything-----")
 cv2.imshow('mask', masked2)
 cv2.imshow('image', img)
