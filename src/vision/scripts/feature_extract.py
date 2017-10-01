@@ -4,7 +4,7 @@ import argparse
 import plantcv as pcv
 
 
-### Parse command-line arguments
+### Parse command-line argumentss
 def options():
     parser = argparse.ArgumentParser(description="Imaging processing with opencv")
     parser.add_argument("-i", "--image", help="Input image file.", required=True)
