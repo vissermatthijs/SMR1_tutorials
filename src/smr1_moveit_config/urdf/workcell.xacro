@@ -15,7 +15,7 @@
     <joint name="env_to_robot" type="fixed">
         <parent link="env"/>
         <child link="base_link"/>
-        <origin xyz="-0.85 -0.42 1.55" rpy="0 0 0"/>
+        <origin xyz="-0.75 -0.52 1.57" rpy="0 0 0"/>
     </joint>
 
     <joint name="eoat_to_tool0" type="fixed">
