@@ -1,8 +1,0 @@
-prefix=/home/ros-industrial/SMR1/install
-
-Name: catkin_tools_prebuild
-Description: Description of catkin_tools_prebuild
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/ros-industrial/SMR1/install/lib 
-Requires: 

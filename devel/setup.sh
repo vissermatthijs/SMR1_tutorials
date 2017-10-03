@@ -1,1 +1,0 @@
-/home/ros-industrial/SMR1/devel/.private/catkin_tools_prebuild/setup.sh
