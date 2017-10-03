@@ -4,6 +4,7 @@
 
 #include <robot/MoveActionServer.h>
 #include <string>
+#include <sstream>
 
 MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n),
                                                          name("MovePlant"),
@@ -19,6 +20,8 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
     bool gotPath = this->planner.plan(goal->x, goal->y, goal->z);
 
+    ROS_INFO("[Robot]: got exec command");
+
     if(gotPath) {
         this->planner.manualPose(goal->x, goal->y, goal->z);
 
@@ -32,5 +35,19 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 }
 
 void MoveActionServer::test() {
-    this->planner.manualPose(std::string("plant_test"));
+    this->planner.manualPose(-0.52f, 0.41f, 1.55f);
+
+   /* std::stringstream ss;
+    ss << "[Position] X: " << this->planner.getCurrentPose().pose.position.x << " Y: " <<
+       this->planner.getCurrentPose().pose.position.y << " Z: " << this->planner.getCurrentPose().pose.position.z;
+
+    ROS_INFO(ss.str().c_str());
+
+    std::stringstream ss2;
+    ss2 << "[Orientation] X: " << this->planner.getCurrentPose().pose.orientation.x << " Y: " <<
+       this->planner.getCurrentPose().pose.orientation.y << " Z: " << this->planner.getCurrentPose().pose.orientation.z <<
+        " W: " << this->planner.getCurrentPose().pose.orientation.w;
+
+    ROS_INFO(ss2.str().c_str()); */
 }
+

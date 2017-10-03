@@ -22,9 +22,9 @@ int main(int argc, char **argv)
 
     ros::Rate loop_rate(1);
 
-    app.test();
-
     while (ros::ok()) {
+
+        app.test();
 
         ros::spinOnce();
         loop_rate.sleep();

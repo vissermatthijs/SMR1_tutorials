@@ -23,9 +23,15 @@ public:
 
     bool plan(float x, float y, float z);
 
+    geometry_msgs::PoseStamped getCurrentPose() {
+        return this->move_group.getCurrentPose();
+    }
+
 private:
 
     moveit::planning_interface::MoveGroupInterface move_group;
+    moveit_msgs::OrientationConstraint ocm;
+    moveit_msgs::Constraints constraints;
 };
 
 #endif //ROBOTLAB_WS_SCNANNPLAN_H

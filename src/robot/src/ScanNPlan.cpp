@@ -5,6 +5,17 @@
 #include <robot/ScanNPlan.h>
 
 ScanNPlan::ScanNPlan(ros::NodeHandle &nh) : move_group("manipulator") {
+
+    this->ocm.link_name = "eoat";
+    this->ocm.header.frame_id = "base_link";
+    this->ocm.orientation.w = 1.0;
+    this->ocm.absolute_x_axis_tolerance = 1.0;
+    this->ocm.absolute_y_axis_tolerance = 1.0;
+    this->ocm.absolute_z_axis_tolerance = 1.0;
+    this->ocm.weight = 1.0;
+
+    this->constraints.orientation_constraints.push_back(ocm);
+    //this->move_group.setPathConstraints(this->constraints);
 }
 
 void ScanNPlan::randomPoses() {
@@ -37,7 +48,6 @@ void ScanNPlan::manualPose(const std::string &pose) {
 void ScanNPlan::manualPose(float x, float y, float z) {
 
     geometry_msgs::Pose move_target;
-    move_target.orientation.w = 1.0;
     move_target.position.x = x;
     move_target.position.y = y;
     move_target.position.z = z;
@@ -49,7 +59,6 @@ void ScanNPlan::manualPose(float x, float y, float z) {
 bool ScanNPlan::plan(float x, float y, float z) {
 
     geometry_msgs::Pose move_target;
-    move_target.orientation.w = 1.0;
     move_target.position.x = x;
     move_target.position.y = y;
     move_target.position.z = z;

@@ -11,6 +11,8 @@
 #include <actionlib/client/terminal_state.h>
 #include <robot/MovePlantAction.h>
 
+tf::TransformBroadcaster *br = nullptr;
+
 void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 {
 
@@ -25,10 +27,9 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
         theta = 1.0f;
 
         ROS_INFO("item_frame: starting tf broadcaster");
-        static tf::TransformBroadcaster br;
-        Frame f(br, std::string("plant"), x, y, z, theta);
+        Frame f(*br, std::string("plant"), std::string("conveyer"), x, y, z, theta);
 
-        f.broadcast();
+      //  f.broadcast();
 
         ROS_INFO("item_frame: creating action client");
         static actionlib::SimpleActionClient<robot::MovePlantAction> ac("MovePlant", true);
@@ -62,6 +63,7 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "item_frame");
+    br = new tf::TransformBroadcaster();
 
     ros::NodeHandle nh;
     ros::NodeHandle private_node_handle ("~");
@@ -79,4 +81,5 @@ int main(int argc, char **argv)
     }
 
     ros::waitForShutdown();
+    delete br;
 }

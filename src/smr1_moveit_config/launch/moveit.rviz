@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1
+        - /MotionPlanning1/Planned Path1
       Splitter Ratio: 0.742560029
     Tree Height: 289
   - Class: rviz/Help
@@ -86,6 +87,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          eoat:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           forearm_link:
             Alpha: 1
             Show Axes: false
@@ -147,7 +153,7 @@ Visualization Manager:
         Interactive Marker Size: 0
         Joint Violation Color: 255; 0; 255
         Planning Group: manipulator
-        Query Goal State: true
+        Query Goal State: false
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -192,6 +198,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          eoat:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           forearm_link:
             Alpha: 1
             Show Axes: false
@@ -230,10 +241,24 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-        Robot Alpha: 0.5
+        Robot Alpha: 1
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
+    - Class: rviz/TF
+      Enabled: false
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        {}
+      Update Interval: 0
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -249,7 +274,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 7.41922331
+      Distance: 5.38796806
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -264,10 +289,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.544796765
+      Pitch: 0.739795923
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 1.13677645
+      Yaw: 2.48178244
     Saved: ~
 Window Geometry:
   Displays:
@@ -285,5 +310,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1828
-  X: 86
+  X: 77
   Y: 31

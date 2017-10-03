@@ -1,6 +1,14 @@
 <?xml version="1.0" ?>
 <robot name="myworkcell" xmlns:xacro="http://ros.org/wiki/xacro">
 
+    <material name="blue">
+        <color rgba="0 0 0.8 1" />
+    </material>
+
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
     <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
 
     <xacro:ur5_robot prefix="" joint_limited="true"/>
@@ -23,6 +31,7 @@
                 <mesh filename="package://smr1_moveit_config/urdf/smrsetup.stl"/>
             </geometry>
             <origin xyz="0 0 0" rpy="3.14 0 3.14" />
+            <material name="blue" />
         </visual>
     </link>
 
@@ -31,6 +40,7 @@
             <geometry>
                 <mesh filename="package://smr1_moveit_config/urdf/eoat.stl" />
             </geometry>
+            <material name="white" />
         </visual>
     </link>
 

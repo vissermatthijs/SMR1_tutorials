@@ -37,9 +37,9 @@ bool PLC::Check(int Result, const char * function) {
     printf("| %s\n",function);
     printf("+-----------------------------------------------------\n"); */
     if (Result==0) {
-       /* printf("| Result         : OK\n");
+        printf("| Result         : OK\n");
         printf("| Execution time : %d ms\n",Client->ExecTime());
-        printf("+-----------------------------------------------------\n"); */
+        printf("+-----------------------------------------------------\n");
     }
     else {
         printf("| ERROR !!! \n");
@@ -62,13 +62,13 @@ bool PLC::getDISensorValue(SENSORS s) {
 
     switch(s) {
         case SENSORS::IR:
-            start = 0;
+            start = 5;
             break;
         default:
             return -1;
     }
 
-    int res=Client->ReadArea(S7AreaPE, 0, start, 1, S7WLByte, &EB);
+    int res=Client->ReadArea(S7AreaPE, 0, start, 1, S7WLBit, &EB);
 
     if (Check(res,"ReadArea"))
     {
