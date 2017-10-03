@@ -3,19 +3,20 @@
 //
 
 #include <robot/ScanNPlan.h>
+#include <tf/tf.h>
 
-ScanNPlan::ScanNPlan(ros::NodeHandle &nh) : move_group("manipulator") {
+ScanNPlan::ScanNPlan(ros::NodeHandle &nh, bool useConstraints) : move_group("manipulator") {
 
-    this->ocm.link_name = "eoat";
-    this->ocm.header.frame_id = "base_link";
-    this->ocm.orientation.w = 1.0;
-    this->ocm.absolute_x_axis_tolerance = 1.0;
-    this->ocm.absolute_y_axis_tolerance = 1.0;
-    this->ocm.absolute_z_axis_tolerance = 1.0;
-    this->ocm.weight = 1.0;
+    if(useConstraints) {
+        this->ocm.link_name = "eoat";
+        this->ocm.header.frame_id = "base_link";
+        this->ocm.orientation.x = 0.0;
+        this->ocm.orientation.y = 0.0;
+        this->ocm.weight = 1.0;
 
-    this->constraints.orientation_constraints.push_back(ocm);
-    //this->move_group.setPathConstraints(this->constraints);
+        this->constraints.orientation_constraints.push_back(ocm);
+        this->move_group.setPathConstraints(this->constraints);
+    }
 }
 
 void ScanNPlan::randomPoses() {
@@ -45,12 +46,26 @@ void ScanNPlan::manualPose(const std::string &pose) {
 }
 
 
-void ScanNPlan::manualPose(float x, float y, float z) {
+void ScanNPlan::manualPose(float x, float y, float z, float w) {
 
     geometry_msgs::Pose move_target;
     move_target.position.x = x;
     move_target.position.y = y;
     move_target.position.z = z;
+    move_target.orientation.w = w;
+
+    move_group.setPoseTarget(move_target);
+    move_group.move();
+}
+
+void ScanNPlan::manualPose(float x, float y, float z, float rx, float ry, float rz) {
+    geometry_msgs::Pose move_target;
+    move_target.position.x = x;
+    move_target.position.y = y;
+    move_target.position.z = z;
+
+    geometry_msgs::Quaternion q = tf::createQuaternionMsgFromRollPitchYaw(rx, ry,rz);
+    move_target.orientation = q;
 
     move_group.setPoseTarget(move_target);
     move_group.move();

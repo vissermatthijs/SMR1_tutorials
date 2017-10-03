@@ -23,7 +23,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
     ROS_INFO("[Robot]: got exec command");
 
     if(gotPath) {
-        this->planner.manualPose(goal->x, goal->y, goal->z);
+        this->planner.manualPose(goal->x, goal->y, goal->z, 1.0f);
 
         this->result.sequence = true;
         this->as_.setSucceeded(this->result);
@@ -35,7 +35,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 }
 
 void MoveActionServer::test() {
-    this->planner.manualPose(-0.52f, 0.41f, 1.55f);
+    this->planner.manualPose(-0.214f, -0.245f, 1.84f, -1.0f);
 
    /* std::stringstream ss;
     ss << "[Position] X: " << this->planner.getCurrentPose().pose.position.x << " Y: " <<

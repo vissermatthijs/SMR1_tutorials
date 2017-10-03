@@ -21,7 +21,7 @@
     <joint name="eoat_to_tool0" type="fixed">
         <parent link="tool0" />
         <child link="eoat" />
-        <origin xyz="0 0 0" rpy="0 0 -2.36"/>
+        <origin xyz="0 0 0" rpy="0 0 0.84"/>
     </joint>
 
     <link name="world"/>
@@ -40,6 +40,7 @@
             <geometry>
                 <mesh filename="package://smr1_moveit_config/urdf/eoat.stl" />
             </geometry>
+             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="white" />
         </visual>
     </link>

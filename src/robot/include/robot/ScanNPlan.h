@@ -16,10 +16,12 @@
 class ScanNPlan
 {
 public:
-    ScanNPlan(ros::NodeHandle& nh);
+    ScanNPlan(ros::NodeHandle& nh, bool useConstraints = true);
     void randomPoses();
     void manualPose(const std::string& pose);
-    void manualPose(float x, float y, float z);
+    void manualPose(float x, float y, float z, float w);
+    void manualPose(float x, float y, float z, float rx, float ry, float rz);
+
 
     bool plan(float x, float y, float z);
 
