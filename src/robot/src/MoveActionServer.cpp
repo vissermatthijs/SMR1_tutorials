@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n),
+MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
                                                          name("MovePlant"),
                                                          as_(n, name,
                                                              boost::bind(&MoveActionServer::exec, this, _1),
@@ -18,20 +18,16 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n),
 
 void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
-    bool gotPath = this->planner.plan(goal->x, goal->y, goal->z);
 
-    ROS_INFO("[Robot]: got exec command");
+    this->planner.manualPose("pickup_step1");
+    this->planner.manualPose("pickup_step2");
+    this->planner.manualPose("pickup_step3");
+    this->planner.manualPose("place_step1");
+    this->planner.manualPose("place_step2");
+    this->planner.manualPose("place_step3");
 
-    if(gotPath) {
-        this->planner.manualPose(goal->x, goal->y, goal->z, 1.0f);
-
-        this->result.sequence = true;
-        this->as_.setSucceeded(this->result);
-
-    } else {
-        this->as_.setPreempted();
-    }
-
+    this->result.sequence = true;
+    this->as_.setSucceeded(this->result);
 }
 
 void MoveActionServer::test() {

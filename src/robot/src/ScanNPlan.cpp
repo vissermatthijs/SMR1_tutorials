@@ -9,10 +9,11 @@ ScanNPlan::ScanNPlan(ros::NodeHandle &nh, bool useConstraints) : move_group("man
 
     if(useConstraints) {
         this->ocm.link_name = "eoat";
-        this->ocm.header.frame_id = "base_link";
-        this->ocm.orientation.x = 0.0;
-        this->ocm.orientation.y = 0.0;
-        this->ocm.weight = 1.0;
+        this->ocm.header.frame_id = "tool0";
+        this->ocm.absolute_x_axis_tolerance = 0.2;
+        this->ocm.absolute_y_axis_tolerance = 0.2;
+        this->ocm.absolute_z_axis_tolerance = 0.2;
+      //  this->ocm.orientation = this->move_group.getPoseTarget("pickup_step2").orientation;
 
         this->constraints.orientation_constraints.push_back(ocm);
         this->move_group.setPathConstraints(this->constraints);

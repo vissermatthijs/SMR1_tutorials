@@ -18,9 +18,7 @@ int main(int argc, char **argv)
 
     ScanNPlan startPlanner(nh, false);
 
-    //startPlanner.manualPose(-0.214f, -0.52f, 1.84f, 0.0f, 1.57f, 1.5f);
-
-    startPlanner.manualPose(-0.214f, -0.52f, 1.84f, 0.78f, 1.57f, 0.0f);
+    startPlanner.manualPose("home");
 
     MoveActionServer app(nh);
 
@@ -29,8 +27,6 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(1);
 
     while (ros::ok()) {
-
-        //app.test();
 
         ros::spinOnce();
         loop_rate.sleep();

@@ -12,25 +12,16 @@
 #include <robot/MovePlantAction.h>
 
 tf::TransformBroadcaster *br = nullptr;
+bool _switch = false;
 
 void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 {
 
     ROS_INFO("item_frame: received moveplant action");
 
-    if(msg->ir) {
+    if(msg->ir && !_switch) {
 
-        float x,y,z, theta;
-        x = 0.5f;
-        y = 0.5f;
-        z = 0.5f;
-        theta = 1.0f;
-
-        ROS_INFO("item_frame: starting tf broadcaster");
-        Frame f(*br, std::string("plant"), std::string("conveyer"), x, y, z, theta);
-
-      //  f.broadcast();
-
+        _switch = true;
         ROS_INFO("item_frame: creating action client");
         static actionlib::SimpleActionClient<robot::MovePlantAction> ac("MovePlant", true);
         ac.waitForServer();
@@ -38,9 +29,9 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
         ROS_INFO("item_frame: action client server connected. Sending goal");
 
         robot::MovePlantGoal goal;
-        goal.x = x;
-        goal.y = y;
-        goal.z = z;
+        goal.x = 0.0f;
+        goal.y = 0.0f;
+        goal.z = 0.0f;
         ac.sendGoal(goal);
 
         bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
@@ -54,6 +45,8 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
             ROS_INFO("Action did not finish before the time out.");
         }
 
+    } else if(!msg->ir && _switch) {
+        _switch = false;
     } else {
         ROS_INFO("item_frame: ir value is false");
     }
