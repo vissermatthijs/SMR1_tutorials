@@ -1,5 +1,6 @@
 # Pipeline starts by importing necessary packages, and defining user inputs
 import argparse
+import glob
 import numpy as np
 
 import cv2
@@ -16,7 +17,7 @@ def options():
     parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=False)
     parser.add_argument("-r", "--result", help="result file.", required=False)
     parser.add_argument("-w", "--writeimg", help="write out images.", default=False)
-    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default='print')
+    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default=None)
     args = parser.parse_args()
     return args
 
@@ -27,7 +28,7 @@ def back_for_ground_sub(img, sliders):
     stop = 0
     sat_thresh = 85
     blue_thresh = 135
-    green_magenta_dark_thresh = 117
+    green_magenta_dark_thresh = 124
     green_magenta_light_thresh = 180
     blue_yellow_thresh = 128
 
@@ -126,15 +127,15 @@ def back_for_ground_sub(img, sliders):
             cv2.imshow('Green_magenta_dark', maskeda_thresh)
             cv2.imshow('Green_magenta_light', maskeda_thresh1)
             cv2.imshow('Blue_yellow_light', maskedb_thresh)
-            cv2.imshow('Mask', masked)
-            cv2.imshow('Mask2', masked2)
-            cv2.imshow('Mask3', masked3)
-            cv2.imshow('masked_a', masked_a)
-            cv2.imshow('masked_b', masked_b)
-            cv2.imshow('fill', ab_fill)
-            cv2.imshow('ab_cnt', ab)
-            cv2.imshow('ab1', ab1)
-            cv2.imshow('ab_cnt2', ab_cnt_2)
+            # cv2.imshow('Mask', masked)
+            # cv2.imshow('Mask2', masked2)
+            # cv2.imshow('Mask3', masked3)
+            # cv2.imshow('masked_a', masked_a)
+            # cv2.imshow('masked_b', masked_b)
+            # cv2.imshow('fill', ab_fill)
+            # cv2.imshow('ab_cnt', ab)
+            # cv2.imshow('ab1', ab1)
+            # cv2.imshow('ab_cnt2', ab_cnt_2)
 
             k = cv2.waitKey(1) & 0xFF
             if k == 27:
@@ -142,6 +143,7 @@ def back_for_ground_sub(img, sliders):
 
         else:
             stop = 1
+
     device, roi1, roi_hierarchy = pcv.define_roi(masked2, 'rectangle', device, roi=None, roi_input='default',
                                                  debug=False, adjust=True, x_adj=100, y_adj=50, w_adj=-150,
                                                  h_adj=-50)
@@ -153,13 +155,19 @@ def back_for_ground_sub(img, sliders):
 
     # Object combine kept objects
     device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug=False)
-    return device, ab_fill, mask, obj
+    return device, ab_fill, maskeda_thresh, obj
 
 
-# Read image
-# img = cv2.imread("yucca_1.jpg")
-img, path, filename = pcv.readimage("Data_set/Original/yucca_4.jpg")
-
-# img = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
-
-device, ab_fill, masked2, obj = back_for_ground_sub(img, True)
+cv_img = []
+i = 0
+for img in glob.glob("Data_set/Foto's/*.jpg"):
+    n = cv2.imread(img)
+    i = i + 1
+    # Read image
+    # img = cv2.imread("yucca_1.jpg")
+    # img, path, filename = pcv.readimage("Data_set/Original/7.jpg")
+    # img = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
+    device, ab_fill, masked2, obj = back_for_ground_sub(n, True)
+    print("test")
+    cv2.imwrite("Data_set/Mask/" + str(i) + ".png", masked2)
+    cv2.imwrite("Data_set/Original/" + str(i) + ".png",n)
