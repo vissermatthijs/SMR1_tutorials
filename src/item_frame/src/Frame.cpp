@@ -4,8 +4,8 @@
 
 #include <item_frame/Frame.h>
 
-Frame::Frame(tf::TransformBroadcaster &br, std::string name, float x, float y, float z, float theta) : br(br),
-name(name), parent("world") {
+Frame::Frame(tf::TransformBroadcaster &br, std::string name, std::string parent, float x, float y, float z, float theta) : br(br),
+name(name), parent(parent) {
 
     this->transform.setOrigin( tf::Vector3(x, y, z));
     this->q.setRPY(0, 0, theta);

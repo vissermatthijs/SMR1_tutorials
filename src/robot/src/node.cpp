@@ -16,13 +16,15 @@ int main(int argc, char **argv)
     std::string base_frame;
     private_node_handle.param<std::string>("base_frame", base_frame, "world"); // parameter name, string object reference, default value
 
+    ScanNPlan startPlanner(nh, false);
+
+    startPlanner.manualPose("home");
+
     MoveActionServer app(nh);
 
     ros::Duration(.5).sleep();  // wait for the class to initialize
 
     ros::Rate loop_rate(1);
-
-    app.test();
 
     while (ros::ok()) {
 

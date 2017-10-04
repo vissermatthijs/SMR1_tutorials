@@ -61,6 +61,54 @@
         <joint name="wrist_2_joint" value="0.7463" />
         <joint name="wrist_3_joint" value="2.5167" />
     </group_state>
+    <group_state name="pickup_step2" group="manipulator">
+        <joint name="elbow_joint" value="1.78" />
+        <joint name="shoulder_lift_joint" value="-0.7116" />
+        <joint name="shoulder_pan_joint" value="1.024" />
+        <joint name="wrist_1_joint" value="-1.024" />
+        <joint name="wrist_2_joint" value="2.5167" />
+        <joint name="wrist_3_joint" value="-0.781" />
+    </group_state>
+    <group_state name="pickup_step1" group="manipulator">
+        <joint name="elbow_joint" value="1.753" />
+        <joint name="shoulder_lift_joint" value="-0.7463" />
+        <joint name="shoulder_pan_joint" value="1.8224" />
+        <joint name="wrist_1_joint" value="-0.9893" />
+        <joint name="wrist_2_joint" value="3.0721" />
+        <joint name="wrist_3_joint" value="-0.781" />
+    </group_state>
+    <group_state name="place_step1" group="manipulator">
+        <joint name="elbow_joint" value="1.763" />
+        <joint name="shoulder_lift_joint" value="-1.2012" />
+        <joint name="shoulder_pan_joint" value="3.00599" />
+        <joint name="wrist_1_joint" value="-0.5414" />
+        <joint name="wrist_2_joint" value="1.4683" />
+        <joint name="wrist_3_joint" value="-0.8108" />
+    </group_state>
+    <group_state name="pickup_step3" group="manipulator">
+        <joint name="elbow_joint" value="1.6141" />
+        <joint name="shoulder_lift_joint" value="-0.7157" />
+        <joint name="shoulder_pan_joint" value="0.9893" />
+        <joint name="wrist_1_joint" value="-1.024" />
+        <joint name="wrist_2_joint" value="2.5861" />
+        <joint name="wrist_3_joint" value="-0.781" />
+    </group_state>
+    <group_state name="place_step3" group="manipulator">
+        <joint name="elbow_joint" value="2.51133" />
+        <joint name="shoulder_lift_joint" value="-1.344" />
+        <joint name="shoulder_pan_joint" value="2.8852" />
+        <joint name="wrist_1_joint" value="-1.1464" />
+        <joint name="wrist_2_joint" value="1.3474" />
+        <joint name="wrist_3_joint" value="-0.8134" />
+    </group_state>
+    <group_state name="place_step2" group="manipulator">
+        <joint name="elbow_joint" value="1.8618" />
+        <joint name="shoulder_lift_joint" value="-0.9919" />
+        <joint name="shoulder_pan_joint" value="3.006" />
+        <joint name="wrist_1_joint" value="-0.8493" />
+        <joint name="wrist_2_joint" value="1.4682" />
+        <joint name="wrist_3_joint" value="-0.8108" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="eoat" parent_link="tool0" group="manipulator" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->

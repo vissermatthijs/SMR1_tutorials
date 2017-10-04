@@ -11,7 +11,9 @@
 
 
 enum SENSORS {
-    IR
+    IR,
+    TEST_MODE,
+    MOVE_BASE
 };
 
 class PLC {
@@ -20,7 +22,7 @@ public:
     TS7CpuInfo getCPUInfo() const;
     TS7CpInfo getCPInfo() const;
 
-    bool getDISensorValue(SENSORS s);
+    void *getSensorValue(SENSORS s);
 
     void publishSensorData();
 

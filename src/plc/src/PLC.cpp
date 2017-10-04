@@ -37,9 +37,9 @@ bool PLC::Check(int Result, const char * function) {
     printf("| %s\n",function);
     printf("+-----------------------------------------------------\n"); */
     if (Result==0) {
-       /* printf("| Result         : OK\n");
+        printf("| Result         : OK\n");
         printf("| Execution time : %d ms\n",Client->ExecTime());
-        printf("+-----------------------------------------------------\n"); */
+        printf("+-----------------------------------------------------\n");
     }
     else {
         printf("| ERROR !!! \n");
@@ -54,36 +54,52 @@ bool PLC::Check(int Result, const char * function) {
 
 }
 
-bool PLC::getDISensorValue(SENSORS s) {
+void *PLC::getSensorValue(SENSORS s) {
 
 
     int start;
-    byte EB;
+    void *EB;
+    byte area;
+
+    int size;
 
     switch(s) {
         case SENSORS::IR:
-            start = 0;
+            start = 5;
+            area = S7AreaPE;
+            size = S7WLBit;
+            break;
+        case SENSORS::TEST_MODE:
+            start = 6;
+            area = S7AreaMK;
+            size = S7WLBit;
+            break;
+        case SENSORS::MOVE_BASE:
+            start = 10;
+            area = S7AreaMK;
+            size = S7WLWord;
             break;
         default:
-            return -1;
+            return nullptr;
     }
 
-    int res=Client->ReadArea(S7AreaPE, 0, start, 1, S7WLByte, &EB);
+    int res=Client->ReadArea(area, 0, start, 1, size, &EB);
 
     if (Check(res,"ReadArea"))
     {
-        return static_cast<bool>(EB);
-    } else {
-        return -1;
+        return EB;
+    }
+    else {
+        return nullptr;
     }
 }
 
 void PLC::publishSensorData() {
 
     plc::sensor_info msg;
-
-    byte IR = this->getDISensorValue(SENSORS::IR);
-    msg.ir = static_cast<bool>(IR);
+    msg.ir = static_cast<bool>(this->getSensorValue(SENSORS::IR));
+    msg.test_mode = static_cast<bool>(this->getSensorValue(SENSORS::TEST_MODE));
+    msg.move_base = reinterpret_cast<long>(this->getSensorValue(SENSORS::MOVE_BASE));
 
     sensor_pub.publish(msg);
 }

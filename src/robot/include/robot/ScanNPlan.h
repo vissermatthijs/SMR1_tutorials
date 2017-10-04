@@ -16,16 +16,24 @@
 class ScanNPlan
 {
 public:
-    ScanNPlan(ros::NodeHandle& nh);
+    ScanNPlan(ros::NodeHandle& nh, bool useConstraints = true);
     void randomPoses();
     void manualPose(const std::string& pose);
-    void manualPose(float x, float y, float z);
+    void manualPose(float x, float y, float z, float w);
+    void manualPose(float x, float y, float z, float rx, float ry, float rz);
+
 
     bool plan(float x, float y, float z);
+
+    geometry_msgs::PoseStamped getCurrentPose() {
+        return this->move_group.getCurrentPose();
+    }
 
 private:
 
     moveit::planning_interface::MoveGroupInterface move_group;
+    moveit_msgs::OrientationConstraint ocm;
+    moveit_msgs::Constraints constraints;
 };
 
 #endif //ROBOTLAB_WS_SCNANNPLAN_H
