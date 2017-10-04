@@ -13,25 +13,38 @@
 
 tf::TransformBroadcaster *br = nullptr;
 bool _switch = false;
+bool _switchTestMode = false;
+int _switchMoveBase = -1;
 
 void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 {
 
     ROS_INFO("item_frame: received moveplant action");
 
-    if(msg->ir && !_switch) {
+    if((msg->ir && !_switch) || (msg->test_mode && !_switchTestMode) ||
+            (msg->move_base && msg->move_base != _switchMoveBase)) {
 
-        _switch = true;
+        robot::MovePlantGoal goal;
+
+        if(msg->test_mode) {
+            _switchTestMode = true;
+            goal.type = 1;
+        } else if(msg->ir) {
+            _switch = true;
+            goal.type = 1;
+        } else if(msg->move_base) {
+            goal.type = 0;
+            _switchMoveBase = msg->move_base;
+        } else {
+            return;
+        }
+
         ROS_INFO("item_frame: creating action client");
         static actionlib::SimpleActionClient<robot::MovePlantAction> ac("MovePlant", true);
         ac.waitForServer();
 
         ROS_INFO("item_frame: action client server connected. Sending goal");
 
-        robot::MovePlantGoal goal;
-        goal.x = 0.0f;
-        goal.y = 0.0f;
-        goal.z = 0.0f;
         ac.sendGoal(goal);
 
         bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
@@ -47,8 +60,8 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 
     } else if(!msg->ir && _switch) {
         _switch = false;
-    } else {
-        ROS_INFO("item_frame: ir value is false");
+    } else if(!msg->test_mode && _switchTestMode) {
+        _switchTestMode = false;
     }
 
 }

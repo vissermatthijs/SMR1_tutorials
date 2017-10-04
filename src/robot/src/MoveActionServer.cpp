@@ -18,13 +18,16 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
 
 void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
-
-    this->planner.manualPose("pickup_step1");
-    this->planner.manualPose("pickup_step2");
-    this->planner.manualPose("pickup_step3");
-    this->planner.manualPose("place_step1");
-    this->planner.manualPose("place_step2");
-    this->planner.manualPose("place_step3");
+    if(goal->type == 0) {
+        this->planner.manualPose("home");
+    } else if(goal->type == 1) {
+        this->planner.manualPose("pickup_step1");
+        this->planner.manualPose("pickup_step2");
+        this->planner.manualPose("pickup_step3");
+        this->planner.manualPose("place_step1");
+        this->planner.manualPose("place_step2");
+        this->planner.manualPose("place_step3");
+    }
 
     this->result.sequence = true;
     this->as_.setSucceeded(this->result);
