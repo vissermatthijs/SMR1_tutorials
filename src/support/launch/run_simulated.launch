@@ -1,0 +1,17 @@
+<launch>
+
+    <include file="$(find smr1_moveit_config)/launch/myworkcell_moveit_planning_execution.launch" >
+        <arg name="sim" value="true"/>
+    </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="conveyer" args="1.45 0.05 1.42 0 0 0 1  world conveyer 100"/>
+
+    <node name="robot_node" pkg="robot" type="node" />
+    <node name="plc_node" pkg="plc" type="node" />
+    <node name="item_frame_node" pkg="item_frame" type="node" />
+
+    <include file="$(find smr1_moveit_config)/launch/moveit_rviz.launch" >
+        <arg name="config" value="true" />
+    </include>
+
+</launch>
