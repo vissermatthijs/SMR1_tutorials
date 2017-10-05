@@ -10,9 +10,18 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
                                                          name("MovePlant"),
                                                          as_(n, name,
                                                              boost::bind(&MoveActionServer::exec, this, _1),
-                                                             false) {
+                                                             false), distance(0.115f) {
 
     this->as_.start();
+
+    counter[0].first = 4;
+    counter[0].second = 1;
+
+    counter[1].first = 0;
+    counter[1].second = 0;
+
+    counter[2].first = 0;
+    counter[2].second = 0;
 }
 
 
@@ -26,8 +35,29 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose("pickup_step3");
         this->planner.manualPose("place_bin1");
 
-        this->planner.manualPose("place_step2");
-        this->planner.manualPose("place_step3");
+        // Get current pose
+        geometry_msgs::Pose p = this->planner.getCurrentPose();
+
+        // Move to right place (xy)
+        p.position.y -= counter[0].first * distance;
+        p.position.x -= counter[0].second * distance;
+        this->planner.manualPose(p);
+
+        // Place plant (z)
+        p.position.z -= 0.13f;
+        this->planner.manualPose(p);
+
+        // Remove end effector from plant
+        p.position.x += 0.15f;
+        p.position.y += 0.15f;
+        this->planner.manualPose(p);
+
+        counter[0].first--;
+
+        if(counter[0].first < 0) {
+            counter[0].first = 4;
+            counter[0].second = 0;
+        }
     }
 
     this->result.sequence = true;
