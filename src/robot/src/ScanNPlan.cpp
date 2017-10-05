@@ -84,6 +84,12 @@ bool ScanNPlan::plan(float x, float y, float z) {
     return move_group.plan(my_plan);
 };
 
+void ScanNPlan::manualPose(geometry_msgs::Pose &p) {
+
+    move_group.setPoseTarget(p);
+    move_group.move();
+}
+
 std::map<std::string, double> ScanNPlan::getNamedTarget(std::string t){
     return this->move_group.getNamedTargetValues(t);
 };
