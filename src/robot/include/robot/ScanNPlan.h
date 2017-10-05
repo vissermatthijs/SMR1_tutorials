@@ -22,13 +22,14 @@ public:
     void manualPose(const std::string& pose);
     void manualPose(float x, float y, float z, float w);
     void manualPose(float x, float y, float z, float rx, float ry, float rz);
+    void manualPose(geometry_msgs::Pose &p);
 
     std::map<std::string, double> getNamedTarget(std::string t);
 
     bool plan(float x, float y, float z);
 
-    geometry_msgs::PoseStamped getCurrentPose() {
-        return this->move_group.getCurrentPose();
+    geometry_msgs::Pose getCurrentPose() {
+        return this->move_group.getCurrentPose().pose;
     }
 
 private:
