@@ -160,7 +160,7 @@ def back_for_ground_sub(img, sliders):
 
 cv_img = []
 i = 0
-for img in glob.glob("Data_set/Foto's/*.jpg"):
+for img in glob.glob("Data_set/Foto's/*.png"):
     n = cv2.imread(img)
     i = i + 1
     # Read image

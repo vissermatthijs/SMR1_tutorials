@@ -27,15 +27,19 @@ def main():
     device = 0
     device, resize_img = pcv.resize(img, 0.2, 0.2, device, debug)
     # Classify the pixels as plant or background
-    device, mask = pcv.naive_bayes_classifier(resize_img, pdf_file="naive_bayes_pdfs.txt", device=0, debug=False)
+    device, mask = pcv.naive_bayes_classifier(resize_img,
+                                              pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
+                                              device=0, debug='print')
 
+    # Median Filter
+    device, blur = pcv.median_blur(mask.get('plant'), 5, device, debug)
     # Identify objects
-    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, mask.get('plant'), device, debug)
+    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, blur, device, debug=None)
 
     # Define ROI
-    device, roi1, roi_hierarchy = pcv.define_roi(mask.get('plant'), 'rectangle', device, roi=None, roi_input='default',
-                                                 debug=True, adjust=False, x_adj=100, y_adj=50, w_adj=-150,
-                                                 h_adj=-50)
+    device, roi1, roi_hierarchy = pcv.define_roi(resize_img, 'rectangle', device, roi=True, roi_input='default',
+                                                 debug=True, adjust=True, x_adj=50, y_adj=10, w_adj=-100,
+                                                 h_adj=0)
     # Decide which objects to keep
     device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(resize_img, 'partial', roi1, roi_hierarchy,
                                                                            id_objects, obj_hierarchy, device, debug)
