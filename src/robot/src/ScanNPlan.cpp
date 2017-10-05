@@ -83,3 +83,7 @@ bool ScanNPlan::plan(float x, float y, float z) {
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     return move_group.plan(my_plan);
 };
+
+std::map<std::string, double> ScanNPlan::getNamedTarget(std::string t){
+    return this->move_group.getNamedTargetValues(t);
+};

@@ -24,7 +24,8 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose("pickup_step1");
         this->planner.manualPose("pickup_step2");
         this->planner.manualPose("pickup_step3");
-        this->planner.manualPose("place_step1");
+        this->planner.manualPose("place_bin1");
+
         this->planner.manualPose("place_step2");
         this->planner.manualPose("place_step3");
     }

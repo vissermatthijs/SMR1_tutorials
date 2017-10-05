@@ -11,7 +11,8 @@
 #include <ros/ros.h>
 #include <tf/tf.h>
 #include <moveit/move_group_interface/move_group_interface.h>
-
+#include <map>
+#include <string>
 
 class ScanNPlan
 {
@@ -22,6 +23,7 @@ public:
     void manualPose(float x, float y, float z, float w);
     void manualPose(float x, float y, float z, float rx, float ry, float rz);
 
+    std::map<std::string, double> getNamedTarget(std::string t);
 
     bool plan(float x, float y, float z);
 
