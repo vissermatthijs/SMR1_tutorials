@@ -9,7 +9,7 @@ rows = c.fetchall()
 for row in rows:
     #print(row)
     rowsliced=row[1:18]
-    a=("1_kop",)
+    a=(0,)
     rowindex=a+rowsliced
     print(rowindex)
     # do your stuff
@@ -23,7 +23,7 @@ rows = c.fetchall()
 for row in rows:
     #print(row)
     rowsliced=row[1:18]
-    a=("2_kop",)
+    a=(1,)
     rowindex=a+rowsliced
     print(rowindex)
     # do your stuff
@@ -37,7 +37,7 @@ rows = c.fetchall()
 for row in rows:
     #print(row)
     rowsliced=row[1:18]
-    a=("3_kop",)
+    a=(2,)
     rowindex=a+rowsliced
     print(rowindex)
     # do your stuff
@@ -51,7 +51,7 @@ rows = c.fetchall()
 for row in rows:
     #print(row)
     rowsliced=row[1:18]
-    a=("Scheef",)
+    a=(3,)
     rowindex=a+rowsliced
     print(rowindex)
     # do your stuff

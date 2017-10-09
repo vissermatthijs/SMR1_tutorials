@@ -5,12 +5,25 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cross_validation import train_test_split
 from sklearn import datasets
-from sklearn.datasets import load_wine
+import numpy as np
+import csv
+import pandas as pd
+
+data=[]
+target=[]
+
+with open('plant_db.csv') as csvfile:
+    dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
+    for row in dataset:
+        data.append(row[1:])
+        target.append(row[0])
 
 
-dataset = datasets.load_wine()
+data = np.asarray(data)
+#print data
+print type(data[0][0])
 
-X_train, X_test, Y_train, Y_test = train_test_split(dataset.data, dataset.target, test_size=0.60, random_state=43)
+X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=0.60, random_state=43)
 
 scaler = MinMaxScaler()
 X_train_norm = scaler.fit_transform(X_train)
