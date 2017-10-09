@@ -1,6 +1,16 @@
 import sqlite3
-conn = sqlite3.connect('example.db')
+import csv
+conn = sqlite3.connect('plant_db')
 c = conn.cursor()
+c.execute('SELECT * from features')
+csvWriter = csv.writer(open("output.csv", "w"))
 
-for row in c.execute('SELECT * FROM poep'):
+rows = c.fetchall()
+csvWriter.writerows(rows)
+
+
+
+
+
+for row in c.execute('SELECT * FROM features'):
         print row
