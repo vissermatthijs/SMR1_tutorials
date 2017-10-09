@@ -33,18 +33,22 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose("pickup_step1");
         this->planner.manualPose("pickup_step2");
         this->planner.manualPose("pickup_step3");
+
+        this->planner.pushConstraintFromCurrentOrientation();
         this->planner.manualPose("place_bin1");
+        this->planner.popCurrentConstraint();
+
 
         // Get current pose
         geometry_msgs::Pose p = this->planner.getCurrentPose();
 
         // Move to right place (xy)
-        p.position.y -= counter[0].first * distance;
-        p.position.x -= counter[0].second * distance;
+        p.position.y += counter[0].first * distance;
+        p.position.x += counter[0].second * distance;
         this->planner.manualPose(p);
 
         // Place plant (z)
-        p.position.z -= 0.13f;
+        p.position.z -= 0.37f;
         this->planner.manualPose(p);
 
         // Remove end effector from plant

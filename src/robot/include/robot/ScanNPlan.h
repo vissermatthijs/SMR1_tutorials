@@ -23,6 +23,8 @@ public:
     void manualPose(float x, float y, float z, float w);
     void manualPose(float x, float y, float z, float rx, float ry, float rz);
     void manualPose(geometry_msgs::Pose &p);
+    void pushConstraintFromCurrentOrientation();
+    void popCurrentConstraint();
 
     std::map<std::string, double> getNamedTarget(std::string t);
 
