@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import argparse
+import numpy as np
 
+import cv2
 import plantcv as pcv
 
 
@@ -27,27 +29,51 @@ def main():
     device = 0
     device, resize_img = pcv.resize(img, 0.2, 0.2, device, debug)
     # Classify the pixels as plant or background
-    device, mask = pcv.naive_bayes_classifier(resize_img,
-                                              pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
-                                              device=0, debug='print')
+    device, mask_img = pcv.naive_bayes_classifier(resize_img,
+                                                  pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
+                                                  device=0, debug='print')
 
     # Median Filter
-    device, blur = pcv.median_blur(mask.get('plant'), 5, device, debug)
+    # device, blur = pcv.median_blur(mask_img.get('plant'), 5, device, debug)
     # Identify objects
-    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, blur, device, debug=None)
+    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, mask_img.get('plant'), device, debug=None)
 
     # Define ROI
     device, roi1, roi_hierarchy = pcv.define_roi(resize_img, 'rectangle', device, roi=True, roi_input='default',
                                                  debug=True, adjust=True, x_adj=50, y_adj=10, w_adj=-100,
                                                  h_adj=0)
     # Decide which objects to keep
-    device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(resize_img, 'partial', roi1, roi_hierarchy,
+    device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(resize_img, 'cutto', roi1, roi_hierarchy,
                                                                            id_objects, obj_hierarchy, device, debug)
+    # print(roi_objects[0])
+    cv2.drawContours(resize_img, [roi_objects[0]], 0, (0, 255, 0), 3)
+    # cv2.imshow("img",resize_img)
+    # cv2.waitKey(0)
+    area_oud = 0
+    i = 0
+    index = 0
+    object_list = []
+    # a = np.array([[hierarchy3[0][0]]])
+    hierarchy = []
+    for cnt in roi_objects:
+        area = cv2.contourArea(cnt)
+        M = cv2.moments(cnt)
+        if ()
+            cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+        if cX > 50 and cX < 300 and cY > 50 and cY < 300:
+            print("Jippie")
+        print(area)
+        if area > 550:
+            area_oud = area
+            index = i
+            object_list.append(roi_objects[i])
+            hierarchy.append(hierarchy3[0][i])
+        i = i + 1
+    a = np.array([hierarchy])
     # Object combine kept objects
-    device, obj, mask = pcv.object_composition(resize_img, roi_objects, hierarchy3, device, debug)
-
+    device, obj, mask = pcv.object_composition(resize_img, object_list, a, device, debug)
     ############### Analysis ################
-
     outfile = False
     if args.writeimg == True:
         outfile = args.outdir + "/" + filename
