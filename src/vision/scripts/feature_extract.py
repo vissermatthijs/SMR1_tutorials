@@ -13,7 +13,7 @@ def options():
     parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=True)
     parser.add_argument("-r", "--result", help="result file.", required=True)
     parser.add_argument("-w", "--writeimg", help="write out images.", default=False)
-    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default='print')
+    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default='plot')
     args = parser.parse_args()
     return args
 
@@ -31,7 +31,7 @@ def main():
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
                                                   pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
-                                                  device=0, debug='print')
+                                                  device=0, debug='plot')
 
     # Median Filter
     # device, blur = pcv.median_blur(mask_img.get('plant'), 5, device, debug)
@@ -58,17 +58,16 @@ def main():
     for cnt in roi_objects:
         area = cv2.contourArea(cnt)
         M = cv2.moments(cnt)
-        if ()
+        if M["m10"] or M["m01"]:
             cX = int(M["m10"] / M["m00"])
-        cY = int(M["m01"] / M["m00"])
-        if cX > 50 and cX < 300 and cY > 50 and cY < 300:
-            print("Jippie")
-        print(area)
-        if area > 550:
-            area_oud = area
-            index = i
-            object_list.append(roi_objects[i])
-            hierarchy.append(hierarchy3[0][i])
+            cY = int(M["m01"] / M["m00"])
+            # check if the location of the contour is between the constrains
+            if cX > 75 and cX < 275 and cY > 25 and cY < 200:
+                cv2.circle(resize_img, (cX, cY), 5, (255, 0, 255), thickness=1, lineType=1, shift=0)
+            # check if the size of the contour is bigger than 250
+            if area > 250:
+                object_list.append(roi_objects[i])
+                hierarchy.append(hierarchy3[0][i])
         i = i + 1
     a = np.array([hierarchy])
     # Object combine kept objects
@@ -110,7 +109,7 @@ def main():
         result.write('\t'.join(map(str, row)))
         result.write("\n")
     result.close()
-
+    print("done")
 
 if __name__ == '__main__':
     main()
