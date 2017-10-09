@@ -14,8 +14,8 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
 
     this->as_.start();
 
-    counter[0].first = 4;
-    counter[0].second = 1;
+    counter[0].first = 0;
+    counter[0].second = 0;
 
     counter[1].first = 0;
     counter[1].second = 0;
@@ -56,11 +56,11 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         p.position.y += 0.15f;
         this->planner.manualPose(p);
 
-        counter[0].first--;
+        counter[0].first++;
 
-        if(counter[0].first < 0) {
-            counter[0].first = 4;
-            counter[0].second = 0;
+        if(counter[0].first > 4) {
+            counter[0].first = 0;
+            counter[0].second = 1;
         }
     }
 
@@ -69,9 +69,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 }
 
 void MoveActionServer::test() {
-    this->planner.manualPose(-0.214f, -0.245f, 1.84f, -1.0f);
+  //  this->planner.manualPose(-0.214f, -0.245f, 1.84f, -1.0f);
 
-   /* std::stringstream ss;
+  /*  std::stringstream ss;
     ss << "[Position] X: " << this->planner.getCurrentPose().pose.position.x << " Y: " <<
        this->planner.getCurrentPose().pose.position.y << " Z: " << this->planner.getCurrentPose().pose.position.z;
 
