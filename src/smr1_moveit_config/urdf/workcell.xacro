@@ -15,7 +15,7 @@
     <joint name="env_to_robot" type="fixed">
         <parent link="env"/>
         <child link="base_link"/>
-        <origin xyz="-0.75 -0.52 1.57" rpy="0 0 0"/>
+        <origin xyz="0.085 0.355 0.880" rpy="0 0 3.14"/>
     </joint>
 
     <joint name="eoat_to_tool0" type="fixed">
@@ -24,15 +24,52 @@
         <origin xyz="0 0 0" rpy="0 0 0.84"/>
     </joint>
 
-    <link name="world"/>
+    <link name="world" />
     <link name="env" >
         <visual>
             <geometry>
-                <mesh filename="package://smr1_moveit_config/urdf/smrsetup.stl"/>
+                <mesh filename="package://smr1_moveit_config/urdf/Conveyor_belt.stl"/>
             </geometry>
-            <origin xyz="0 0 0" rpy="3.14 0 3.14" />
+            <origin xyz="-0.73 -0.02 0.666" rpy="1.57 0 0.0" />
             <material name="blue" />
         </visual>
+
+        <collision>
+            <geometry>
+                <box size="3.01 0.44 0.845"/>
+            </geometry>
+            <origin xyz="-0.73 -0.22 0.3225" rpy="0 0 0.0" />
+        </collision>
+
+        <visual>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/Tafel.stl"/>
+            </geometry>
+            <origin xyz="1.0 0.35 0" rpy="0 0 3.14" />
+            <material name="blue" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="2.0 0.70 0.860"/>
+            </geometry>
+            <origin xyz="1.0 0.35 0.43" rpy="0 0 0.0" />
+        </collision>
+
+        <visual>
+            <geometry>
+                <box size="4.0 0.10 3.0"/>
+            </geometry>
+            <origin xyz="0.0 0.76 1.5" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="4.0 0.10 3.0"/>
+            </geometry>
+            <origin xyz="0.0 0.76 1.5" rpy="0 0 0" />
+        </collision>
     </link>
 
     <link name="eoat">
