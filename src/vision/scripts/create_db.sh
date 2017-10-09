@@ -11,7 +11,7 @@
 
 time \
 /home/matthijs/plantcv/plantcv-pipeline.py \
--d /home/matthijs/yucca1 \
+-d /home/matthijs/Plant_db/run2/yucca1 \
 -p /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/feature_extract.py \
 -a filename \
 -s plant_db \
