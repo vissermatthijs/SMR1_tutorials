@@ -1,16 +1,58 @@
 import sqlite3
 import csv
-conn = sqlite3.connect('plant_db')
+csvWriter = csv.writer(open("plant_db.csv", "w"))
+conn = sqlite3.connect('scripts/plant_db_1')
 c = conn.cursor()
 c.execute('SELECT * from features')
-csvWriter = csv.writer(open("output.csv", "w"))
 
 rows = c.fetchall()
-csvWriter.writerows(rows)
+for row in rows:
+    #print(row)
+    rowsliced=row[1:18]
+    a=("1_kop",)
+    rowindex=a+rowsliced
+    print(rowindex)
+    # do your stuff
+    csvWriter.writerow(rowindex)
 
+conn = sqlite3.connect('scripts/plant_db_2')
+c = conn.cursor()
+c.execute('SELECT * from features')
 
+rows = c.fetchall()
+for row in rows:
+    #print(row)
+    rowsliced=row[1:18]
+    a=("2_kop",)
+    rowindex=a+rowsliced
+    print(rowindex)
+    # do your stuff
+    csvWriter.writerow(rowindex)
 
+conn = sqlite3.connect('scripts/plant_db_3')
+c = conn.cursor()
+c.execute('SELECT * from features')
 
+rows = c.fetchall()
+for row in rows:
+    #print(row)
+    rowsliced=row[1:18]
+    a=("3_kop",)
+    rowindex=a+rowsliced
+    print(rowindex)
+    # do your stuff
+    csvWriter.writerow(rowindex)
 
-for row in c.execute('SELECT * FROM features'):
-        print row
+conn = sqlite3.connect('scripts/plant_db_4')
+c = conn.cursor()
+c.execute('SELECT * from features')
+
+rows = c.fetchall()
+for row in rows:
+    #print(row)
+    rowsliced=row[1:18]
+    a=("Scheef",)
+    rowindex=a+rowsliced
+    print(rowindex)
+    # do your stuff
+    csvWriter.writerow(rowindex)
