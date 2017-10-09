@@ -4,7 +4,6 @@
 
 #include <robot/ScanNPlan.h>
 #include <tf/tf.h>
-#include <math.h>
 
 ScanNPlan::ScanNPlan(ros::NodeHandle &nh, bool useConstraints) : move_group("manipulator") {
 
@@ -94,12 +93,12 @@ void ScanNPlan::manualPose(geometry_msgs::Pose &p) {
 void ScanNPlan::pushConstraintFromCurrentOrientation() {
 
     this->ocm.link_name = "eoat";
-    this->ocm.header.frame_id = "tool0";
-    this->ocm.weight = 1.0;
-    this->ocm.absolute_x_axis_tolerance = M_PI;
-    this->ocm.absolute_y_axis_tolerance = M_PI;
-    this->ocm.absolute_z_axis_tolerance = M_PI;
-    this->ocm.orientation = tf::createQuaternionMsgFromRollPitchYaw(0.0f, 0.0f, M_PI);
+    this->ocm.header.frame_id = "base_link";
+    this->ocm.weight = 1.0f;
+    this->ocm.absolute_x_axis_tolerance = 3.14f;
+    this->ocm.absolute_y_axis_tolerance = 3.14f;
+    this->ocm.absolute_z_axis_tolerance = 3.14f;
+    this->ocm.orientation = tf::createQuaternionMsgFromRollPitchYaw(0.1f, 0.1f, 3.14f);
 
     this->constraints.orientation_constraints.push_back(ocm);
     this->move_group.setPathConstraints(this->constraints);
