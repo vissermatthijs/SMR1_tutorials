@@ -4,7 +4,6 @@ from xgboost import XGBClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cross_validation import train_test_split
-from sklearn import datasets
 import numpy as np
 import csv
 
