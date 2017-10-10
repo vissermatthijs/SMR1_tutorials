@@ -4,20 +4,20 @@
 
 #include <robot/ScanNPlan.h>
 #include <tf/tf.h>
-
 ScanNPlan::ScanNPlan(ros::NodeHandle &nh, bool useConstraints) : move_group("manipulator") {
 
-    if(useConstraints) {
+   /* if(useConstraints) {
         this->ocm.link_name = "eoat";
         this->ocm.header.frame_id = "tool0";
         this->ocm.absolute_x_axis_tolerance = 0.2;
         this->ocm.absolute_y_axis_tolerance = 0.2;
         this->ocm.absolute_z_axis_tolerance = 0.2;
-      //  this->ocm.orientation = this->move_group.getPoseTarget("pickup_step2").orientation;
+        this->ocm.orientation = tf::createQuaternionMsgFromRollPitchYaw(0.0f, 0.0f , 6.28f);
 
         this->constraints.orientation_constraints.push_back(ocm);
         this->move_group.setPathConstraints(this->constraints);
-    }
+    } */
+
 }
 
 void ScanNPlan::randomPoses() {
@@ -88,6 +88,30 @@ void ScanNPlan::manualPose(geometry_msgs::Pose &p) {
 
     move_group.setPoseTarget(p);
     move_group.move();
+}
+
+void ScanNPlan::pushConstraintFromCurrentOrientation() {
+
+    this->ocm.link_name = "eoat";
+    this->ocm.header.frame_id = this->move_group.getPoseReferenceFrame();
+    this->ocm.weight = 1.0;
+
+    // 0.717030 0.084245 -0.431452 0.540944
+    this->ocm.orientation = getCurrentPose().orientation;
+
+    this->ocm.absolute_x_axis_tolerance = 0.1;
+    this->ocm.absolute_y_axis_tolerance = 0.1;
+    this->ocm.absolute_z_axis_tolerance = 2.0 * 3.14;
+
+    this->constraints.orientation_constraints.push_back(ocm);
+    this->move_group.setPathConstraints(this->constraints);
+
+}
+
+void ScanNPlan::popCurrentConstraint() {
+
+    this->constraints.orientation_constraints.clear();
+    this->move_group.clearPathConstraints();
 }
 
 std::map<std::string, double> ScanNPlan::getNamedTarget(std::string t){

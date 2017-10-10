@@ -14,8 +14,8 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
 
     this->as_.start();
 
-    counter[0].first = 4;
-    counter[0].second = 1;
+    counter[0].first = 0;
+    counter[0].second = 0;
 
     counter[1].first = 0;
     counter[1].second = 0;
@@ -33,18 +33,22 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose("pickup_step1");
         this->planner.manualPose("pickup_step2");
         this->planner.manualPose("pickup_step3");
+
+        this->planner.pushConstraintFromCurrentOrientation();
         this->planner.manualPose("place_bin1");
+        this->planner.popCurrentConstraint();
+
 
         // Get current pose
         geometry_msgs::Pose p = this->planner.getCurrentPose();
 
         // Move to right place (xy)
-        p.position.y -= counter[0].first * distance;
-        p.position.x -= counter[0].second * distance;
+        p.position.y += counter[0].first * distance;
+        p.position.x += counter[0].second * distance;
         this->planner.manualPose(p);
 
         // Place plant (z)
-        p.position.z -= 0.13f;
+        p.position.z -= 0.37f;
         this->planner.manualPose(p);
 
         // Remove end effector from plant
@@ -52,11 +56,11 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         p.position.y += 0.15f;
         this->planner.manualPose(p);
 
-        counter[0].first--;
+        counter[0].first++;
 
-        if(counter[0].first < 0) {
-            counter[0].first = 4;
-            counter[0].second = 0;
+        if(counter[0].first > 4) {
+            counter[0].first = 0;
+            counter[0].second = 1;
         }
     }
 
@@ -65,9 +69,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 }
 
 void MoveActionServer::test() {
-    this->planner.manualPose(-0.214f, -0.245f, 1.84f, -1.0f);
+  //  this->planner.manualPose(-0.214f, -0.245f, 1.84f, -1.0f);
 
-   /* std::stringstream ss;
+  /*  std::stringstream ss;
     ss << "[Position] X: " << this->planner.getCurrentPose().pose.position.x << " Y: " <<
        this->planner.getCurrentPose().pose.position.y << " Z: " << this->planner.getCurrentPose().pose.position.z;
 
