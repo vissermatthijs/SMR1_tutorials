@@ -20,9 +20,9 @@ with open('plant_db.csv') as csvfile:
 
 
 data = np.asarray(data)
-print data
+#print(data)
 
-X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=0.20, random_state=15)
+X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=0.30, random_state=20)
 
 scaler = MinMaxScaler()
 X_train_norm = scaler.fit_transform(X_train)
@@ -32,9 +32,9 @@ lda = LinearDiscriminantAnalysis(n_components=3)
 X_train_lda = lda.fit_transform(X_train_norm, Y_train)
 X_test_lda = lda.transform(X_test_norm)
 
-svm = SVC(kernel="rbf", C=1.0, random_state=0)
+svm = SVC(kernel="rbf", C=0.7, random_state=0)
 svm.fit(X_train_lda, Y_train)
 
 z = svm.predict(X_test_lda)
 
-print ('accuracy: %0.2f' % accuracy_score(Y_test, z))
+print ('accuracy: %0.4f' % accuracy_score(Y_test, z))
