@@ -1,4 +1,9 @@
 # Load libraries
+import pandas as pd
+import xgboost as xgb
+from sklearn.preprocessing import LabelEncoder
+from numpy import loadtxt
+from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.svm import SVC
@@ -32,9 +37,14 @@ lda = LinearDiscriminantAnalysis(n_components=3)
 X_train_lda = lda.fit_transform(X_train_norm, Y_train)
 X_test_lda = lda.transform(X_test_norm)
 
-svm = SVC(kernel="rbf", C=1.0, random_state=0)
-svm.fit(X_train_lda, Y_train)
 
-z = svm.predict(X_test_lda)
+model = XGBClassifier()
+model.fit(X_train_lda, Y_train)
 
-print ('accuracy: %0.4f' % accuracy_score(Y_test, z))
+print(model)
+
+y_pred = model.predict(X_test_lda)
+
+
+
+print ('accuracy: %0.4f' % accuracy_score(Y_test, y_pred))

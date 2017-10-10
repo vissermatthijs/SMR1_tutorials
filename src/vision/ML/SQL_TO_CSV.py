@@ -45,7 +45,6 @@ for row in rows:
     # do your stuff
     csvWriter.writerow(rowindex)
 
-
 '''
 conn = sqlite3.connect('scripts/plant_db_4')
 c = conn.cursor()
@@ -62,5 +61,8 @@ for row in rows:
     csvWriter.writerow(rowindex)
 
 '''
+
+
+
 
 
