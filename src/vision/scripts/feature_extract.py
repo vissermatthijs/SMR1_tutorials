@@ -18,6 +18,7 @@ def options():
     return args
 
 
+
 ### Main pipeline
 def main():
     print("step one")
@@ -130,19 +131,37 @@ def main():
     device, left, right, center_h = pcv.y_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
 
     device, points_rescaled, centroid_rescaled, bottomline_rescaled = pcv.scale_features(obj, mask,
-                                                                                         list_of_acute_points,
-                                                                                         225, device, debug)
+                                                                                         list_of_acute_points, 225,
+                                                                                         device, debug)
+
+
+
     # Identify acute vertices (tip points) of an object
     # Results in set of point values that may indicate tip points
     device, vert_ave_c, hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b = pcv.landmark_reference_pt_dist(
         points_rescaled, centroid_rescaled, bottomline_rescaled, device, debug)
+
+    landmark_header = ['HEADER_LANDMARK', 'tip_points', 'tip_points_r', 'centroid_r', 'baseline_r', 'tip_number',
+                       'vert_ave_c',
+                       'hori_ave_c', 'euc_ave_c', 'ang_ave_c', 'vert_ave_b', 'hori_ave_b', 'euc_ave_b', 'ang_ave_b',
+                       'left_lmk', 'right_lmk', 'center_h_lmk', 'left_lmk_r', 'right_lmk_r', 'center_h_lmk_r',
+                       'top_lmk', 'bottom_lmk', 'center_v_lmk', 'top_lmk_r', 'bottom_lmk_r', 'center_v_lmk_r']
+    landmark_data = ['LANDMARK_DATA', 0, 0, 0, 0, len(list_of_acute_points), vert_ave_c,
+                     hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0]
     # Write shape and color data to results fil
     result = open(args.result, "a")
-    result.write('\t'.join(map(str, points_rescaled)))
-    result.write("\n")
     result.write('\t'.join(map(str, shape_header)))
     result.write("\n")
     result.write('\t'.join(map(str, shape_data)))
+    result.write("\n")
+    result.write('\t'.join(map(str, watershed_header)))
+    result.write("\n")
+    result.write('\t'.join(map(str, watershed_data)))
+    result.write("\n")
+    result.write('\t'.join(map(str, landmark_header)))
+    result.write("\n")
+    result.write('\t'.join(map(str, landmark_data)))
     result.write("\n")
     for row in shape_img:
         result.write('\t'.join(map(str, row)))
