@@ -18,8 +18,13 @@ def options():
     return args
 
 
+
 ### Main pipeline
 def main():
+    print("step one")
+    """
+    Step one: Background forground substraction 
+    """
     # Get options
     args = options()
     debug = args.debug
@@ -27,16 +32,21 @@ def main():
     img, path, filename = pcv.readimage(args.image)
     # Pipeline step
     device = 0
-    device, resize_img = pcv.resize(img, 0.2, 0.2, device, debug)
+    device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
                                                   pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
                                                   device=0, debug='print')
 
     # Median Filter
-    # device, blur = pcv.median_blur(mask_img.get('plant'), 5, device, debug)
+    device, blur = pcv.median_blur(mask_img.get('plant'), 5, device, debug)
+    print("step two")
+    """
+    Step one: Identifiy the objects, extract and filter the objects
+    """
+
     # Identify objects
-    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, mask_img.get('plant'), device, debug=None)
+    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, blur, device, debug=None)
 
     # Define ROI
     device, roi1, roi_hierarchy = pcv.define_roi(resize_img, 'rectangle', device, roi=True, roi_input='default',
@@ -46,7 +56,7 @@ def main():
     device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(resize_img, 'cutto', roi1, roi_hierarchy,
                                                                            id_objects, obj_hierarchy, device, debug)
     # print(roi_objects[0])
-    cv2.drawContours(resize_img, [roi_objects[0]], 0, (0, 255, 0), 3)
+    # cv2.drawContours(resize_img, [roi_objects[0]], 0, (0, 255, 0), 3)
     # cv2.imshow("img",resize_img)
     # cv2.waitKey(0)
     area_oud = 0
@@ -62,21 +72,42 @@ def main():
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
             # check if the location of the contour is between the constrains
-            if cX > 75 and cX < 225 and cY > 25 and cY < 200:
+            if cX > 200 and cX < 500 and cY > 25 and cY < 400:
                 # cv2.circle(resize_img, (cX, cY), 5, (255, 0, 255), thickness=1, lineType=1, shift=0)
             # check if the size of the contour is bigger than 250
-                if area > 250:
+                if area > 450:
+                    obj = np.vstack(roi_objects)
                     object_list.append(roi_objects[i])
                     hierarchy.append(hierarchy3[0][i])
+                    print(i)
         i = i + 1
     a = np.array([hierarchy])
+    #a = [[[-1,-1,-1,-1][-1,-1,-1,-1][-1,-1,-1,-1]]]
     # Object combine kept objects
-    device, obj, mask = pcv.object_composition(resize_img, object_list, a, device, debug)
+    # device, obj, mask_2 = pcv.object_composition(resize_img, object_list, a, device, debug)
+
+    mask_contours = np.zeros(resize_img.shape, np.uint8)
+    cv2.drawContours(mask_contours, object_list, -1, (255, 255, 255), -1)
+    gray_image = cv2.cvtColor(mask_contours, cv2.COLOR_BGR2GRAY)
+    ret, mask_contours = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
+
+    # Identify objects
+    device, id_objects, obj_hierarchy = pcv.find_objects(resize_img, mask_contours, device, debug=None)
+    # Decide which objects to keep
+    device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(resize_img, 'cutto', roi1, roi_hierarchy,
+                                                                           id_objects, obj_hierarchy, device,
+                                                                           debug=None)
+    # Object combine kept objects
+    device, obj, mask = pcv.object_composition(resize_img, roi_objects, hierarchy3, device, debug=None)
     ############### Analysis ################
     outfile = False
     if args.writeimg == True:
         outfile = args.outdir + "/" + filename
 
+    print("step three")
+    """
+    Step three: Calculate all the features
+    """
     # Find shape properties, output shape image (optional)
     device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device, debug,
                                                                      args.outdir + '/' + filename)
@@ -91,12 +122,44 @@ def main():
                                                                     debug,
                                                                     'all', 'v', 'img', 300,
                                                                     args.outdir + '/' + filename)
+    device, watershed_header, watershed_data, analysis_images = pcv.watershed_segmentation(device, resize_img, mask, 50,
+                                                                                           './examples', debug)
+    device, list_of_acute_points = pcv.acute_vertex(obj, 30, 60, 10, resize_img, device, debug)
 
-    # Write shape and color data to results file
+    device, top, bottom, center_v = pcv.x_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
+
+    device, left, right, center_h = pcv.y_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
+
+    device, points_rescaled, centroid_rescaled, bottomline_rescaled = pcv.scale_features(obj, mask,
+                                                                                         list_of_acute_points, 225,
+                                                                                         device, debug)
+
+    # Identify acute vertices (tip points) of an object
+    # Results in set of point values that may indicate tip points
+    device, vert_ave_c, hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b = pcv.landmark_reference_pt_dist(
+        points_rescaled, centroid_rescaled, bottomline_rescaled, device, debug)
+
+    landmark_header = ['HEADER_LANDMARK', 'tip_points', 'tip_points_r', 'centroid_r', 'baseline_r', 'tip_number',
+                       'vert_ave_c',
+                       'hori_ave_c', 'euc_ave_c', 'ang_ave_c', 'vert_ave_b', 'hori_ave_b', 'euc_ave_b', 'ang_ave_b',
+                       'left_lmk', 'right_lmk', 'center_h_lmk', 'left_lmk_r', 'right_lmk_r', 'center_h_lmk_r',
+                       'top_lmk', 'bottom_lmk', 'center_v_lmk', 'top_lmk_r', 'bottom_lmk_r', 'center_v_lmk_r']
+    landmark_data = ['LANDMARK_DATA', 0, 0, 0, 0, len(list_of_acute_points), vert_ave_c,
+                     hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0]
+    # Write shape and color data to results fil
     result = open(args.result, "a")
     result.write('\t'.join(map(str, shape_header)))
     result.write("\n")
     result.write('\t'.join(map(str, shape_data)))
+    result.write("\n")
+    result.write('\t'.join(map(str, watershed_header)))
+    result.write("\n")
+    result.write('\t'.join(map(str, watershed_data)))
+    result.write("\n")
+    result.write('\t'.join(map(str, landmark_header)))
+    result.write("\n")
+    result.write('\t'.join(map(str, landmark_data)))
     result.write("\n")
     for row in shape_img:
         result.write('\t'.join(map(str, row)))

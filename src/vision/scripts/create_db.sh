@@ -11,8 +11,8 @@
 
 time \
 /home/matthijs/plantcv/plantcv-pipeline.py \
--d /home/matthijs/Plant_db/run2/yucca4 \
+-d /home/matthijs/Plant_db/run3/yucca3 \
 -p /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/feature_extract.py \
 -a filename \
--s plant_db_4 \
+-s plant_db_3 \
 -f camera_timestamp_id_other
