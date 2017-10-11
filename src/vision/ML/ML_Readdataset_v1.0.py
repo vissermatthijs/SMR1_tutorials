@@ -22,7 +22,7 @@ with open('plant_db.csv') as csvfile:
 data = np.asarray(data)
 #print(data)
 
-X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=0.17, random_state=20)
+X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=0.20, random_state=20)
 
 scaler = MinMaxScaler()
 X_train_norm = scaler.fit_transform(X_train)
