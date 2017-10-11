@@ -39,7 +39,7 @@ X_test_lda = lda.transform(X_test_norm)
 
 '''
 
-# fit model no training data
+# fit model no training datasad
 model = XGBClassifier(
     learning_rate=0.3,
     max_depth=4,
