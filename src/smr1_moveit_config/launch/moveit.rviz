@@ -6,6 +6,9 @@ Panels:
       Expanded:
         - /MotionPlanning1
         - /MotionPlanning1/Scene Robot1
+        - /MotionPlanning1/Planning Request1
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.742560029
     Tree Height: 156
   - Class: rviz/Help
@@ -150,7 +153,7 @@ Visualization Manager:
         Colliding Link Color: 255; 0; 0
         Goal State Alpha: 1
         Goal State Color: 250; 128; 0
-        Interactive Marker Size: 0
+        Interactive Marker Size: 0.200000003
         Joint Violation Color: 255; 0; 255
         Planning Group: manipulator
         Query Goal State: true
@@ -245,6 +248,70 @@ Visualization Manager:
         Show Robot Collision: true
         Show Robot Visual: true
       Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        base:
+          Value: true
+        base_link:
+          Value: false
+        camera_frame:
+          Value: false
+        conveyer:
+          Value: false
+        ee_link:
+          Value: true
+        env:
+          Value: false
+        eoat:
+          Value: false
+        forearm_link:
+          Value: false
+        shoulder_link:
+          Value: false
+        tool0:
+          Value: true
+        upper_arm_link:
+          Value: false
+        world:
+          Value: false
+        wrist_1_link:
+          Value: false
+        wrist_2_link:
+          Value: false
+        wrist_3_link:
+          Value: false
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          base_link:
+            base:
+              {}
+            shoulder_link:
+              upper_arm_link:
+                forearm_link:
+                  wrist_1_link:
+                    wrist_2_link:
+                      wrist_3_link:
+                        ee_link:
+                          eoat:
+                            {}
+                        tool0:
+                          {}
+          camera_frame:
+            {}
+          conveyer:
+            {}
+          env:
+            {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -260,7 +327,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 4.84070396
+      Distance: 4.03060675
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -275,10 +342,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.549796999
+      Pitch: 0.444797158
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 3.1517663
+      Yaw: 3.97493124
     Saved: ~
 Window Geometry:
   Displays:

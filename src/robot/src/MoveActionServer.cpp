@@ -43,17 +43,17 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         geometry_msgs::Pose p = this->planner.getCurrentPose();
 
         // Move to right place (xy)
-        p.position.y += counter[0].first * distance;
-        p.position.x += counter[0].second * distance;
+        p.position.y -= counter[0].first * distance;
+        p.position.x -= counter[0].second * distance;
         this->planner.manualPose(p);
 
         // Place plant (z)
-        p.position.z -= 0.37f;
+        p.position.z -= 0.20f;
         this->planner.manualPose(p);
 
         // Remove end effector from plant
-        p.position.x += 0.15f;
-        p.position.y += 0.15f;
+        p.position.x -= 0.15f;
+        p.position.y -= 0.15f;
         this->planner.manualPose(p);
 
         counter[0].first++;

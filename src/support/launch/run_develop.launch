@@ -4,7 +4,7 @@
 
     <node pkg="tf" type="static_transform_publisher" name="conveyer" args="1.45 0.05 1.42 0 0 0 1  world conveyer 100"/>
 
-    <node name="robot_node" pkg="robot" type="node" />
+    <node name="robot_node" pkg="robot" type="node" output="screen"/>
     <node name="plc_node" pkg="plc" type="node" />
     <node name="item_frame_node" pkg="item_frame" type="node" />
 
