@@ -31,6 +31,7 @@ for row in rows:
     # do your stuff
     csvWriter.writerow(rowindex)
 
+
 conn = sqlite3.connect('scripts/plant_db_3')
 c = conn.cursor()
 c.execute('SELECT * from features')

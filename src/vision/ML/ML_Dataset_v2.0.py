@@ -7,6 +7,11 @@ from sklearn.cross_validation import train_test_split
 import numpy as np
 import csv
 
+# ____variables____
+seed =26 #random_state
+test_size = 0.15 #test_size
+n_components = 3 #LDA components
+
 data=[]
 target=[]
 
@@ -18,16 +23,13 @@ with open('plant_db.csv') as csvfile:
 
 data = np.asarray(data)
 
-seed = 20
-test_size = 0.25
 X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=test_size, random_state=seed)
-
 
 scaler = MinMaxScaler()
 X_train_norm = scaler.fit_transform(X_train)
 X_test_norm = scaler.transform(X_test)
 
-lda = LinearDiscriminantAnalysis(n_components=3)
+lda = LinearDiscriminantAnalysis(n_components=n_components)
 X_train_lda = lda.fit_transform(X_train_norm, Y_train)
 X_test_lda = lda.transform(X_test_norm)
 
