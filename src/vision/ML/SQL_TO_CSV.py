@@ -10,7 +10,7 @@ c.execute('SELECT * from features')
 rows = c.fetchall()
 for row in rows:
     #print(row)
-    rowsliced=row[1:11]+row[12:18]
+    rowsliced=row[1:11] + row[12:18] + row[29:30] + row[34:43]
     a=(0,)
     rowindex=a+rowsliced
     print(rowindex)
@@ -24,7 +24,7 @@ c.execute('SELECT * from features')
 rows = c.fetchall()
 for row in rows:
     #print(row)
-    rowsliced = row[1:11] + row[12:18]
+    rowsliced = row[1:11] + row[12:18] + row[29:30] + row[34:43]
     a=(1,)
     rowindex=a+rowsliced
     print(rowindex)
@@ -38,7 +38,7 @@ c.execute('SELECT * from features')
 rows = c.fetchall()
 for row in rows:
     #print(row)
-    rowsliced = row[1:11] + row[12:18]
+    rowsliced = row[1:11] + row[12:18] + row[29:30] + row[34:43]
     a=(2,)
     rowindex=a+rowsliced
     print(rowindex)
@@ -54,7 +54,7 @@ c.execute('SELECT * from features')
 rows = c.fetchall()
 for row in rows:
     #print(row)
-    rowsliced = row[1:11] + row[12:18]
+    rowsliced = row[1:11] + row[12:18] + row[29:30] + row[34:43]
     a=(3,)
     rowindex=a+rowsliced
     print(rowindex)
