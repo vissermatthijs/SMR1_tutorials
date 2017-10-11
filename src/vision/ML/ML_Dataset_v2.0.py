@@ -41,7 +41,6 @@ X_test_lda = lda.transform(X_test_norm)
 
 # fit model no training data
 model = XGBClassifier(
-    eta=0.3,
     learning_rate=0.3,
     max_depth=4,
     n_estimators=30,
@@ -52,7 +51,7 @@ model = XGBClassifier(
     min_child_weight=1,
     max_delta_step=0,
     subsample=0.5,
-    colsample_bytree=0.4,
+    colsample_bytree=1,
     colsample_bylevel=1,
     reg_alpha=2.6,
     reg_lambda=6,
