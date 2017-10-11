@@ -134,8 +134,6 @@ def main():
                                                                                          list_of_acute_points, 225,
                                                                                          device, debug)
 
-
-
     # Identify acute vertices (tip points) of an object
     # Results in set of point values that may indicate tip points
     device, vert_ave_c, hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b = pcv.landmark_reference_pt_dist(
