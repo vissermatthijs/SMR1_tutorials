@@ -122,6 +122,11 @@ def main():
                                                                     debug,
                                                                     'all', 'v', 'img', 300,
                                                                     args.outdir + '/' + filename)
+
+    maks_watershed = mask.copy()
+    kernel = np.zeros((5, 5), dtype=np.uint8)
+    device, mask_watershed, = pcv.erode(maks_watershed, 5, 1, device, debug)
+
     device, watershed_header, watershed_data, analysis_images = pcv.watershed_segmentation(device, resize_img, mask, 50,
                                                                                            './examples', debug)
     device, list_of_acute_points = pcv.acute_vertex(obj, 30, 60, 10, resize_img, device, debug)
