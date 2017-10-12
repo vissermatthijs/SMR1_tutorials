@@ -1,19 +1,17 @@
 # Load libraries
 from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
-from xgboost import plot_importance
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cross_validation import train_test_split
 import numpy as np
+import joblib
 import csv
 
 # ____variables____
+
 seed = 5 #random_state
-test_size = 0.26 #test_size
+test_size = 0.21 #test_size
 n_components = 3 #LDA components
-
-
 
 data=[]
 target=[]
@@ -32,18 +30,11 @@ scaler = MinMaxScaler()
 X_train_norm = scaler.fit_transform(X_train)
 X_test_norm = scaler.transform(X_test)
 
-'''
-lda = LinearDiscriminantAnalysis(n_components=n_components)
-X_train_lda = lda.fit_transform(X_train_norm, Y_train)
-X_test_lda = lda.transform(X_test_norm)
-
-'''
-
 # fit model no training datasad
 model = XGBClassifier(
-    learning_rate=0.3,
-    max_depth=4,
-    n_estimators=30,
+    learning_rate=0.24,
+    max_depth=8,
+    n_estimators=15,
     silent=False,
     objective='binary:logistic',
     nthread=-1,
@@ -54,7 +45,7 @@ model = XGBClassifier(
     colsample_bytree=1,
     colsample_bylevel=1,
     reg_alpha=2.6,
-    reg_lambda=6,
+    reg_lambda=5,
     scale_pos_weight=1,
     base_score=0.5,
     seed=0
@@ -66,7 +57,13 @@ model.fit(X_train_norm, Y_train)
 print(model.feature_importances_)
 
 # make predictions for test data
-y_pred = model.predict(X_test_norm)
+y_pred_test = model.predict(X_test_norm)
+y_pred_train = model.predict(X_train_norm)
+
+# save model to file
+joblib.dump(model, "pima.joblib.dat")
+print ("Model Saved...")
 
 # print accuracy
-print ('accuracy: %0.2f' % accuracy_score(Y_test, y_pred))
+print ("accuracy_on_test:"+'%0.3f' % accuracy_score(Y_test, y_pred_test))
+print ("accuracy_on_train:"+'%0.3f' % accuracy_score(Y_train, y_pred_train))
