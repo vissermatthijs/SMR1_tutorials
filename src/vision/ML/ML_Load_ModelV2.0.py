@@ -1,14 +1,15 @@
 # Load libraries
 from sklearn.metrics import accuracy_score
-from xgboost import XGBClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cross_validation import train_test_split
 import numpy as np
 import joblib
 import csv
 
-# ____variables____
+# load model from file
+loaded_model = joblib.load("pima.joblib.dat")
 
+# ____variables____
 seed = 5 #random_state
 test_size = 0.21 #test_size
 n_components = 3 #LDA components
@@ -30,40 +31,12 @@ scaler = MinMaxScaler()
 X_train_norm = scaler.fit_transform(X_train)
 X_test_norm = scaler.transform(X_test)
 
-# fit model no training datasad
-model = XGBClassifier(
-    learning_rate=0.24,
-    max_depth=8,
-    n_estimators=15,
-    silent=False,
-    objective='binary:logistic',
-    nthread=-1,
-    gamma=0,
-    min_child_weight=1,
-    max_delta_step=0,
-    subsample=0.5,
-    colsample_bytree=1,
-    colsample_bylevel=1,
-    reg_alpha=2.6,
-    reg_lambda=5,
-    scale_pos_weight=1,
-    base_score=0.5,
-    seed=0
-)
-#train model with data
-model.fit(X_train_norm, Y_train)
-
 # feature importance
-print(model.feature_importances_)
+print(loaded_model.feature_importances_)
 
 # make predictions for test data
-y_pred_test = model.predict(X_test_norm)
-y_pred_train = model.predict(X_train_norm)
+y_pred_test = loaded_model.predict(X_test_norm)
+y_pred_train = loaded_model.predict(X_train_norm)
 
-# save model to file
-joblib.dump(model, "pima.joblib.dat")
-print ("Model Saved...")
-
-# print accuracy
 print ("accuracy_on_test:"+'%0.3f' % accuracy_score(Y_test, y_pred_test))
 print ("accuracy_on_train:"+'%0.3f' % accuracy_score(Y_train, y_pred_train))
