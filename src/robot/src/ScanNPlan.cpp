@@ -3,7 +3,9 @@
 //
 
 #include <robot/ScanNPlan.h>
-#include <tf/tf.h>
+#include <geometric_shapes/shape_operations.h>
+#include <geometric_shapes/solid_primitive_dims.h>
+
 ScanNPlan::ScanNPlan(ros::NodeHandle &nh, bool useConstraints) : move_group("manipulator") {
 
    /* if(useConstraints) {
@@ -19,6 +21,28 @@ ScanNPlan::ScanNPlan(ros::NodeHandle &nh, bool useConstraints) : move_group("man
     } */
 
     this->move_group.setEndEffectorLink("tool0");
+    this->plant_object.header.frame_id = this->move_group.getPlanningFrame();
+    this->plant_object.id = "plant";
+    shape_msgs::SolidPrimitive primitive;
+    primitive.type = primitive.CYLINDER;
+
+    primitive.dimensions.resize(
+            geometric_shapes::SolidPrimitiveDimCount<shape_msgs::SolidPrimitive::CYLINDER>::value);
+    primitive.dimensions[primitive.CYLINDER_HEIGHT] = 0.20;
+    primitive.dimensions[primitive.CYLINDER_RADIUS] = 0.025;
+
+    geometry_msgs::Pose object_pose;
+    object_pose.orientation.w = 1.0;
+    object_pose.position.x = -0.30;
+    object_pose.position.y = -0.18;
+    object_pose.position.z = 1.13;
+
+
+    this->plant_object.primitives.push_back(primitive);
+    this->plant_object.primitive_poses.push_back(object_pose);
+    this->plant_object.operation = this->plant_object.ADD;
+    this->collision_objects.push_back(this->plant_object);
+
 }
 
 void ScanNPlan::randomPoses() {
@@ -96,7 +120,7 @@ void ScanNPlan::pushConstraintFromCurrentOrientation() {
     this->ocm.link_name = "tool0";
     this->ocm.weight = 1.0;
     this->ocm.orientation = this->getCurrentOrientation();
-    this->ocm.absolute_x_axis_tolerance = 1.57;
+    this->ocm.absolute_x_axis_tolerance = 2.34;
     this->ocm.absolute_y_axis_tolerance = 1.57;
     this->ocm.absolute_z_axis_tolerance = 2.0 * 3.14;
 
@@ -109,6 +133,23 @@ void ScanNPlan::popCurrentConstraint() {
 
     this->constraints.orientation_constraints.clear();
     this->move_group.clearPathConstraints();
+}
+
+void ScanNPlan::pushCollisionObject(){
+
+    //this->plant_object.header.frame_id = this->move_group.getPlanningFrame();
+    this->planning_scene_interface.addCollisionObjects(this->collision_objects);
+    ros::Duration(1.0).sleep();
+    this->move_group.attachObject(this->plant_object.id,"eoat");
+}
+
+void ScanNPlan::popCollisionObject(){
+    this->move_group.detachObject(this->plant_object.id);
+
+    std::vector<std::string> ids;
+    ids.push_back(this->plant_object.id);
+    this->planning_scene_interface.removeCollisionObjects(ids);
+
 }
 
 std::map<std::string, double> ScanNPlan::getNamedTarget(std::string t){
