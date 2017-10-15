@@ -1,26 +1,38 @@
-#!/usr/bin/python
+from xgboost import XGBClassifier
+# !/usr/bin/python
 import argparse
+import cv2
+import plantcv as pcv
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.cross_validation import train_test_split
+import numpy as np
+import csv
+# !/usr/bin/python
+import argparse
+import csv
 import numpy as np
 
 import cv2
 import plantcv as pcv
+from sklearn.cross_validation import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from xgboost import XGBClassifier
 
 
 ### Parse command-line argumentss
 def options():
     parser = argparse.ArgumentParser(description="Imaging processing with opencv")
-    parser.add_argument("-i", "--image", help="Input image file.", required=True)
-    parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=True)
+    parser.add_argument("-i", "--image", help="Input image file.", required=False)
+    parser.add_argument("-o", "--outdir", help="Output directory for image files.", required=False)
     parser.add_argument("-r", "--result", help="result file.", required=True)
     parser.add_argument("-w", "--writeimg", help="write out images.", default=False)
-    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default='plot')
+    parser.add_argument("-D", "--debug", help="Turn on debug, prints intermediate images.", default='print')
     args = parser.parse_args()
     return args
 
 
-
 ### Main pipeline
-def main():
+def get_feature(img):
     print("step one")
     """
     Step one: Background forground substraction 
@@ -29,7 +41,8 @@ def main():
     args = options()
     debug = args.debug
     # Read image
-    img, path, filename = pcv.readimage(args.image)
+    filename = args.result
+    # img, path, filename = pcv.readimage(args.image)
     # Pipeline step
     device = 0
     device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
@@ -74,7 +87,7 @@ def main():
             # check if the location of the contour is between the constrains
             if cX > 200 and cX < 500 and cY > 25 and cY < 400:
                 # cv2.circle(resize_img, (cX, cY), 5, (255, 0, 255), thickness=1, lineType=1, shift=0)
-            # check if the size of the contour is bigger than 250
+                # check if the size of the contour is bigger than 250
                 if area > 450:
                     obj = np.vstack(roi_objects)
                     object_list.append(roi_objects[i])
@@ -82,7 +95,7 @@ def main():
                     print(i)
         i = i + 1
     a = np.array([hierarchy])
-    #a = [[[-1,-1,-1,-1][-1,-1,-1,-1][-1,-1,-1,-1]]]
+    # a = [[[-1,-1,-1,-1][-1,-1,-1,-1][-1,-1,-1,-1]]]
     # Object combine kept objects
     # device, obj, mask_2 = pcv.object_composition(resize_img, object_list, a, device, debug)
 
@@ -109,19 +122,19 @@ def main():
     Step three: Calculate all the features
     """
     # Find shape properties, output shape image (optional)
-    device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device, debug,
-                                                                     args.outdir + '/' + filename)
+    device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device, debug
+                                                                     )
 
     # Shape properties relative to user boundary line (optional)
     device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(resize_img, args.image, obj, mask, 1680,
-                                                                              device,
-                                                                              debug, args.outdir + '/' + filename)
+                                                                              device
+                                                                              )
 
     # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
     device, color_header, color_data, color_img = pcv.analyze_color(resize_img, args.image, kept_mask, 256, device,
                                                                     debug,
-                                                                    'all', 'v', 'img', 300,
-                                                                    args.outdir + '/' + filename)
+                                                                    'all', 'v', 'img', 300
+                                                                    )
 
     maks_watershed = mask.copy()
     kernel = np.zeros((5, 5), dtype=np.uint8)
@@ -152,6 +165,16 @@ def main():
     landmark_data = ['LANDMARK_DATA', 0, 0, 0, 0, len(list_of_acute_points), vert_ave_c,
                      hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0]
+    shape_data_train = list(shape_data)
+    shape_data_train.pop(0)
+    shape_data_train.pop(10)
+    watershed_data_train = list(watershed_data)
+    watershed_data_train.pop(0)
+    landmark_data_train = [len(list_of_acute_points), vert_ave_c,
+                           hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b]
+    X = shape_data_train + watershed_data_train + landmark_data_train
+    print("len X", len(X))
+    print(X)
     # Write shape and color data to results fil
     result = open(args.result, "a")
     result.write('\t'.join(map(str, shape_header)))
@@ -177,7 +200,80 @@ def main():
         result.write('\t'.join(map(str, row)))
         result.write("\n")
     result.close()
+    return X
     print("done")
 
-if __name__ == '__main__':
-    main()
+
+def train_model():
+    # ____variables____
+    print('training model....')
+    seed = 5  # random_state
+    test_size = 0.21  # test_size
+    n_components = 3  # LDA components
+
+    data = []
+    target = []
+
+    with open('plant_db.csv') as csvfile:
+        dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in dataset:
+            data.append(row[1:])
+            target.append(row[0])
+
+    scaler = MinMaxScaler()
+    data = scaler.fit_transform(data)
+    # X_test_norm = scaler.transform(X_test)
+
+    X_train_norm, X_test_norm, Y_train, Y_test = train_test_split(data, target, test_size=test_size, random_state=seed)
+    print(X_test_norm[0:1])
+    # print(data)
+
+
+    # fit model no training datasad
+    model = XGBClassifier(
+        learning_rate=0.24,
+        max_depth=8,
+        n_estimators=15,
+        silent=False,
+        objective='binary:logistic',
+        nthread=-1,
+        gamma=0,
+        min_child_weight=1,
+        max_delta_step=0,
+        subsample=0.5,
+        colsample_bytree=1,
+        colsample_bylevel=1,
+        reg_alpha=2.6,
+        reg_lambda=5,
+        scale_pos_weight=1,
+        base_score=0.5,
+        seed=0
+    )
+    # train model with data
+    model.fit(X_train_norm, Y_train)
+    print('done')
+    return model, scaler
+
+
+print("opening cam")
+# cap = cv2.VideoCapture(1)
+# cap.set(3, 1920)
+# cap.set(4, 1080)
+model, scaler = train_model()
+
+while True:
+    # ret, frame = cap.read()
+    # input_ = input("Cap image? :")
+    # print(input_)
+    frame = cv2.imread(
+        "/home/matthijs/PycharmProjects/SMR1/src/vision/scripts/yucca_rename/yucca2/cam1_17-12-10_yucca2_223.png")
+    input_ = "y"
+    if str(input_) == "y":
+        X = get_feature(frame)
+        X = np.array(X)
+        X = scaler.transform([X])
+        y_pred = model.predict(X)
+        print(y_pred)
+
+    else:
+        pass
