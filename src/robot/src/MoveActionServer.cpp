@@ -14,7 +14,7 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
 
     this->as_.start();
 
-    counter[0].first = 0;
+    counter[0].first = 1;
     counter[0].second = 0;
 
     counter[1].first = 0;
@@ -34,9 +34,11 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose("pickup_step2");
         this->planner.manualPose("pickup_step3");
 
+        this->planner.pushCollisionObject();
         this->planner.pushConstraintFromCurrentOrientation();
         this->planner.manualPose("place_bin1");
         this->planner.popCurrentConstraint();
+
 
 
         // Get current pose
@@ -48,7 +50,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose(p);
 
         // Place plant (z)
-        p.position.z -= 0.20f;
+        p.position.z -= 0.24f;
         this->planner.manualPose(p);
 
         // Remove end effector from plant
@@ -62,6 +64,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             counter[0].first = 0;
             counter[0].second = 1;
         }
+        this->planner.popCollisionObject();
     }
 
     this->result.sequence = true;
