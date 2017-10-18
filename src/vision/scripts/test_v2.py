@@ -66,7 +66,7 @@ if __name__ == "__main__":
     lines = cv2.HoughLinesP(image=bw2, rho=0.02, theta=np.pi / 500, threshold=10, lines=np.array([]),
                             minLineLength=minLineLength, maxLineGap=100)
 
-    a, b, c = lines.shape()
+    a, b, c = lines.
     for i in range(a):
         cv2.line(src, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
 
