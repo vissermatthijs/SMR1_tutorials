@@ -2,6 +2,7 @@ import numpy as np
 import sys
 
 import cv2
+import shapely.geometry as shapgeo
 import weave
 
 
@@ -52,6 +53,55 @@ def thinning(src):
     return dst * 255
 
 
+def find_leaves_crosses(bw2):
+    # start var:
+    kernel = np.ones((5, 5), np.uint8)
+    bw2_rgb = cv2.cvtColor(bw2, cv2.COLOR_GRAY2RGB)
+    points = []
+
+    # step one: find points
+    corners = cv2.goodFeaturesToTrack(bw2, maxCorners=100, qualityLevel=0.01, minDistance=20)
+    for corner in corners:
+        x, y = corner.ravel()
+        cv2.circle(bw2_rgb, (x, y), 3, (0, 255, 0), -1)
+    cv2.imshow('key_points', bw2_rgb)
+    cv2.waitKey(1000)
+    # corners = np.int0(corners)
+
+    # cv2.circle(bw2, (x, y), 3, 255, -1)
+    # step two: create border for the points
+    bw3 = cv2.dilate(bw2, kernel, iterations=2)
+    # step three: find the contour and draw them
+    cnts, hier = cv2.findContours(bw3, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    cnts_main = np.vstack(np.vstack(cnts))
+
+    cnts_lines = shapgeo.asLineString(cnts_main)
+    print(cnts_lines.length)
+    print(len(corners))
+    i = 0
+    bw3_rgb = cv2.cvtColor(bw3, cv2.COLOR_GRAY2RGB)
+    for corner in corners:
+        x, y = corner.ravel()
+        for corner2 in corners:
+            x2, y2 = corner2.ravel()
+            corner_lines = shapgeo.LineString(((x, y), (x2, y2)))
+            # print(corner_lines)
+            # print(cnts_lines)
+            if not (corner_lines.intersects(cnts_lines)):
+                # print("Valid line found")
+                i = i + 1
+                cv2.line(bw3_rgb, (x, y), (x2, y2), (255, 0, 0))
+    print(i)
+    cv2.drawContours(bw3_rgb, cnts, -1, (0, 255, 0), 1)
+    cv2.imshow("bw3", bw3_rgb)
+    # step three: draw line between points and check if it is between boundry
+
+
+
+
+
+
 if __name__ == "__main__":
     src = cv2.imread("/home/matthijs/PycharmProjects/SMR1/src/vision/scripts/12_er_image_itr_1.png")
     if src == None:
@@ -61,25 +111,17 @@ if __name__ == "__main__":
     bw2 = thinning(bw2)
     cv2.imshow("src", bw)
     minLineLength = bw2.shape[1] - 300
-    # lines = cv2.HoughLinesP(bw2, 1, np.pi / 180, 1, 100, 1)
 
-    lines = cv2.HoughLinesP(image=bw2, rho=0.02, theta=np.pi / 500, threshold=10, lines=np.array([]),
-                            minLineLength=minLineLength, maxLineGap=100)
+    lines = cv2.HoughLinesP(bw2, 1, np.pi / 180, 1, 10, 0.5)
 
-    a, b, c = lines.
-    for i in range(a):
-        cv2.line(src, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
+    print(len(lines[0]))
+    find_leaves_crosses(bw2)
 
-        # for x1, y1, x2, y2 in lines[0]:
-        #    cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    # for x1, y1, x2, y2 in lines[0]:
+    # cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         # bw2, eigImage, tempImage, cornerCount, qualityLevel, minDistance, mask = None, blockSize = 3, useHarris = 0, k = 0.04
-    corners = cv2.goodFeaturesToTrack(bw2, 100, 0.0001, 10)
-    corners = np.int0(corners)
 
-    for i in corners:
-        x, y = i.ravel()
-        cv2.circle(src, (x, y), 3, 255, -1)
 
     cv2.imshow("feature_info", src)
     cv2.imshow("thinning", bw2)
