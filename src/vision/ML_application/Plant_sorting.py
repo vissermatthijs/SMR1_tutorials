@@ -1,15 +1,8 @@
-from xgboost import XGBClassifier
 # !/usr/bin/python
-import argparse
-import cv2
-import plantcv as pcv
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.cross_validation import train_test_split
-import numpy as np
-import csv
 # !/usr/bin/python
 import argparse
 import csv
+import glob
 import numpy as np
 
 import cv2
@@ -122,9 +115,10 @@ def get_feature(img):
     Step three: Calculate all the features
     """
     # Find shape properties, output shape image (optional)
-    device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device, debug
+    device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device, debug,
+                                                                     filename="/file"
                                                                      )
-
+    print(shape_img)
     # Shape properties relative to user boundary line (optional)
     device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(resize_img, args.image, obj, mask, 1680,
                                                                               device
@@ -135,7 +129,6 @@ def get_feature(img):
                                                                     debug,
                                                                     'all', 'v', 'img', 300
                                                                     )
-
     maks_watershed = mask.copy()
     kernel = np.zeros((5, 5), dtype=np.uint8)
     device, mask_watershed, = pcv.erode(maks_watershed, 5, 1, device, debug)
@@ -200,8 +193,11 @@ def get_feature(img):
         result.write('\t'.join(map(str, row)))
         result.write("\n")
     result.close()
-    return X
     print("done")
+    print(shape_img)
+    return X, shape_img
+
+
 
 
 def train_model():
@@ -255,25 +251,29 @@ def train_model():
     return model, scaler
 
 
+def stats():
+    # function for keeping track of the yucka stats
+    # stats could be: total amount, average widht
+    a = 1
 print("opening cam")
 # cap = cv2.VideoCapture(1)
 # cap.set(3, 1920)
 # cap.set(4, 1080)
 model, scaler = train_model()
-
-while True:
+dir = "/home/matthijs/Plant_db/run2/yucca4/*.png"
+for img in glob.glob(dir):
+    image = cv2.imread(img)
     # ret, frame = cap.read()
     # input_ = input("Cap image? :")
     # print(input_)
-    frame = cv2.imread(
-        "/home/matthijs/PycharmProjects/SMR1/src/vision/scripts/yucca_rename/yucca2/cam1_17-12-10_yucca2_223.png")
-    input_ = "y"
-    if str(input_) == "y":
-        X = get_feature(frame)
-        X = np.array(X)
-        X = scaler.transform([X])
-        y_pred = model.predict(X)
-        print(y_pred)
+    scaled_img = cv2.resize(image, (0, 0), fx=0.2, fy=0.2)
+    X, shape_img = get_feature(image)
+    X = np.array(X)
+    X = scaler.transform([X])
+    y_pred = model.predict(X)
+    pred = str(y_pred[0][0])
 
-    else:
-        pass
+    cv2.putText(scaled_img, pred, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    cv2.imshow("scaled_img", scaled_img)
+    cv2.waitKey(1000)
+    print(y_pred)
