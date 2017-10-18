@@ -60,9 +60,18 @@ if __name__ == "__main__":
     _, bw2 = cv2.threshold(bw, 10, 255, cv2.THRESH_BINARY)
     bw2 = thinning(bw2)
     cv2.imshow("src", bw)
-    lines = cv2.HoughLinesP(bw2, 1, np.pi / 180, 1, 100, 1)
-    for x1, y1, x2, y2 in lines[0]:
-        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    minLineLength = bw2.shape[1] - 300
+    # lines = cv2.HoughLinesP(bw2, 1, np.pi / 180, 1, 100, 1)
+
+    lines = cv2.HoughLinesP(image=bw2, rho=0.02, theta=np.pi / 500, threshold=10, lines=np.array([]),
+                            minLineLength=minLineLength, maxLineGap=100)
+
+    a, b, c = lines.shape()
+    for i in range(a):
+        cv2.line(src, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
+
+        # for x1, y1, x2, y2 in lines[0]:
+        #    cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         # bw2, eigImage, tempImage, cornerCount, qualityLevel, minDistance, mask = None, blockSize = 3, useHarris = 0, k = 0.04
     corners = cv2.goodFeaturesToTrack(bw2, 100, 0.0001, 10)
