@@ -58,7 +58,7 @@ def find_leaves_crosses(bw2):
     kernel = np.ones((5, 5), np.uint8)
     bw2_rgb = cv2.cvtColor(bw2, cv2.COLOR_GRAY2RGB)
     points = []
-
+    rcs = []
     # step one: find points
     corners = cv2.goodFeaturesToTrack(bw2, maxCorners=100, qualityLevel=0.01, minDistance=20)
     for corner in corners:
@@ -91,10 +91,21 @@ def find_leaves_crosses(bw2):
             if not (corner_lines.intersects(cnts_lines)):
                 # print("Valid line found")
                 i = i + 1
-                cv2.line(bw3_rgb, (x, y), (x2, y2), (255, 0, 0))
+                dy = (y2 - y)
+                dx = (x2 - x)
+                if (dx != 0):
+                    rc = abs(y2 - y) / abs(x2 - x)
+                    rcs.append(rc)
+                    cv2.line(bw3_rgb, (x, y), (x2, y2), (255, 0, 0))
+        # check if it is a corss point
+        if (np.max(rcs) - np.min(rcs)) > 2:
+            # print("draw poitn")
+            cv2.circle(bw2_rgb, (x, y), 5, (0, 0, 255), -1)
+
     print(i)
     cv2.drawContours(bw3_rgb, cnts, -1, (0, 255, 0), 1)
     cv2.imshow("bw3", bw3_rgb)
+    cv2.imshow('crosses', bw2_rgb)
     # step three: draw line between points and check if it is between boundry
 
 
