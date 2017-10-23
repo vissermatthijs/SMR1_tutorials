@@ -6,6 +6,7 @@ import numpy as np
 
 import cv2
 import plantcv as pcv
+import serial
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from xgboost import XGBClassifier
@@ -247,25 +248,34 @@ def train_model():
     return model, scaler
 
 
-print("opening cam")
-# cap = cv2.VideoCapture(1)
-# cap.set(3, 1920)
-# cap.set(4, 1080)
-model, scaler = train_model()
+def show(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.resize(gray, (0, 0), fx=0.35, fy=0.35)
+    cv2.imshow("frame", gray)
+    cv2.waitKey(1)
 
+
+print("opening cam")
+cap = cv2.VideoCapture(1)
+cap.set(3, 1920)
+cap.set(4, 1080)
+model, scaler = train_model()
+ser = serial.Serial('/dev/ttyACM0', 9600)
+cap = cv2.VideoCapture(1)
+cap.set(3, 1920)
+cap.set(4, 1080)
 while True:
-    # ret, frame = cap.read()
-    # input_ = input("Cap image? :")
-    # print(input_)
-    frame = cv2.imread(
-        "/home/matthijs/PycharmProjects/SMR1/src/vision/scripts/yucca_rename/yucca2/cam1_17-12-10_yucca2_223.png")
-    input_ = "y"
-    if str(input_) == "y":
-        X = get_feature(frame)
+    if ser.readline() == b'1\r\n':
+        ret, frame = cap.read()
+        image = frame.copy()
+        show(image)
+        X = get_feature(image)
         X = np.array(X)
         X = scaler.transform([X])
         y_pred = model.predict(X)
         print(y_pred)
-
+        ser.reset_input_buffer()
     else:
         pass
+
+cap.release()

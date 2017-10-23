@@ -260,6 +260,8 @@ print("opening cam")
 # cap.set(3, 1920)
 # cap.set(4, 1080)
 model, scaler = train_model()
+# model = joblib.load("pima.joblib.dat")
+
 dir = "/home/matthijs/Plant_db/run2/yucca4/*.png"
 for img in glob.glob(dir):
     image = cv2.imread(img)
