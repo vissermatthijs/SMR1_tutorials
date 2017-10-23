@@ -50,38 +50,40 @@ class FPS:
 
 
 class WebcamVideoStream:
-    def __init__(self, src=0):
+    def __init__(self, src=1):
         # initialize the video camera stream and read the first frame
         # from the stream
         self.stream = cv2.VideoCapture(src)
+        self.stream.set(3, 1920)
+        self.stream.set(4, 1080)
         (self.grabbed, self.frame) = self.stream.read()
 
         # initialize the variable used to indicate if the thread should
         # be stopped
         self.stopped = False
 
-        def start(self):
-            # start the thread to read frames from the video stream
-            Thread(target=self.update, args=()).start()
-            return self
+    def start(self):
+        # start the thread to read frames from the video stream
+        Thread(target=self.update, args=()).start()
+        return self
 
-        def update(self):
-            # keep looping infinitely until the thread is stopped
-            while True:
-                # if the thread indicator variable is set, stop the thread
-                if self.stopped:
-                    return
+    def update(self):
+        # keep looping infinitely until the thread is stopped
+        while True:
+            # if the thread indicator variable is set, stop the thread
+            if self.stopped:
+                return
 
-                # otherwise, read the next frame from the stream
-                (self.grabbed, self.frame) = self.stream.read()
+            # otherwise, read the next frame from the stream
+            (self.grabbed, self.frame) = self.stream.read()
 
-        def read(self):
-            # return the frame most recently read
-            return self.frame
+    def read(self):
+        # return the frame most recently read
+        return self.frame
 
-        def stop(self):
-            # indicate that the thread should be stopped
-            self.stopped = True
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True
 ### Parse command-line argumentss
 def options():
     parser = argparse.ArgumentParser(description="Imaging processing with opencv")
@@ -182,7 +184,7 @@ def get_feature(img):
 
     print("step three")
     """
-    Step three: Calculate all the features
+    Step three: Calculate all the features if object is found
     """
     # Find shape properties, output shape image (optional)
     device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device, debug
@@ -358,7 +360,7 @@ cv2.destroyAllWindows()
 # created a *threaded* video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from webcam...")
-vs = WebcamVideoStream(src=0).start()
+vs = WebcamVideoStream(src=1).start()
 fps = FPS().start()
 
 # loop over some frames...this time using the threaded stream
@@ -366,7 +368,7 @@ while fps._numFrames < 100:
     # grab the frame from the threaded video stream and resize it
     # to have a maximum width of 400 pixels
     frame = vs.read()
-    frame = imutils.resize(frame, width=400)
+    # frame = imutils.resize(frame, width=400)
 
     # check to see if the frame should be displayed to our screen
     if 1 > 0:
@@ -377,21 +379,13 @@ while fps._numFrames < 100:
     fps.update()
 
 # stop the timer and display FPS information
-fps.stop()
-print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-
-# do a bit of cleanup
-cv2.destroyAllWindows()
-vs.stop()
+# print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+#print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
 while True:
     if ser.readline() == b'1\r\n':
-        cap = cv2.VideoCapture(1)
-        cap.set(3, 1920)
-        cap.set(4, 1080)
-        ret, frame = cap.read()
-        image = frame.copy()
+
+        image = vs.read()
         show(image)
         X = get_feature(image)
         X = np.array(X)
@@ -399,7 +393,6 @@ while True:
         y_pred = model.predict(X)
         print(y_pred)
         ser.reset_input_buffer()
-        cap.release()
     else:
         pass
 
