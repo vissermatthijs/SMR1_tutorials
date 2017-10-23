@@ -264,6 +264,7 @@ ser = serial.Serial('/dev/ttyACM0', 9600)
 cap = cv2.VideoCapture(1)
 cap.set(3, 1920)
 cap.set(4, 1080)
+a = "bier"
 while True:
     if ser.readline() == b'1\r\n':
         ret, frame = cap.read()
