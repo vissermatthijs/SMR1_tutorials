@@ -120,9 +120,9 @@ void ScanNPlan::pushConstraintFromCurrentOrientation() {
     this->ocm.link_name = "tool0";
     this->ocm.weight = 1.0;
     this->ocm.orientation = this->getCurrentOrientation();
-    this->ocm.absolute_x_axis_tolerance = 2.34;
-    this->ocm.absolute_y_axis_tolerance = 1.57;
-    this->ocm.absolute_z_axis_tolerance = 2.0 * 3.14;
+    this->ocm.absolute_x_axis_tolerance = 3.14 / 2.0;
+    this->ocm.absolute_y_axis_tolerance = 3.14 / 2.0;
+    this->ocm.absolute_z_axis_tolerance = 3.14 * 2.0;
 
     this->constraints.orientation_constraints.push_back(ocm);
     this->move_group.setPathConstraints(this->constraints);

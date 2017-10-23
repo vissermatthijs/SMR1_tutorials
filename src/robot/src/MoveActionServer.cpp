@@ -35,9 +35,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         this->planner.manualPose("pickup_step3");
 
         this->planner.pushCollisionObject();
-        this->planner.pushConstraintFromCurrentOrientation();
+        //this->planner.pushConstraintFromCurrentOrientation();
         this->planner.manualPose("place_bin1");
-        this->planner.popCurrentConstraint();
+        //this->planner.popCurrentConstraint();
 
 
 
@@ -64,7 +64,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             counter[0].first = 0;
             counter[0].second = 1;
         }
-        this->planner.popCollisionObject();
+      //  this->planner.popCollisionObject();
     }
 
     this->result.sequence = true;
