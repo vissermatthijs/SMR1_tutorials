@@ -1,11 +1,11 @@
 # Load libraries
-from sklearn.metrics import accuracy_score
-from xgboost import XGBClassifier
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.cross_validation import train_test_split
-import numpy as np
-import joblib
 import csv
+
+import joblib
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler
+from xgboost import XGBClassifier
 
 # ____variables____
 
@@ -22,13 +22,14 @@ with open('plant_db.csv') as csvfile:
         data.append(row[1:])
         target.append(row[0])
 
-data = np.asarray(data)
-
-X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=test_size, random_state=seed)
-
 scaler = MinMaxScaler()
-X_train_norm = scaler.fit_transform(X_train)
-X_test_norm = scaler.transform(X_test)
+data = scaler.fit_transform(data)
+# X_test_norm = scaler.transform(X_test)
+
+X_train_norm, X_test_norm, Y_train, Y_test = train_test_split(data, target, test_size=test_size, random_state=seed)
+print(X_test_norm[0:1])
+# print(data)
+
 
 # fit model no training datasad
 model = XGBClassifier(
