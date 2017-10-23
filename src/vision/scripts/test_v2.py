@@ -55,12 +55,12 @@ def thinning(src):
 
 def find_leaves_crosses(bw2):
     # start var:
-    kernel = np.ones((5, 5), np.uint8)
+    kernel = np.ones((10, 10), np.uint8)
     bw2_rgb = cv2.cvtColor(bw2, cv2.COLOR_GRAY2RGB)
     points = []
     rcs = []
     # step one: find points
-    corners = cv2.goodFeaturesToTrack(bw2, maxCorners=100, qualityLevel=0.01, minDistance=20)
+    corners = cv2.goodFeaturesToTrack(bw2, maxCorners=300, qualityLevel=0.01, minDistance=20)
     for corner in corners:
         x, y = corner.ravel()
         cv2.circle(bw2_rgb, (x, y), 3, (0, 255, 0), -1)
@@ -70,7 +70,7 @@ def find_leaves_crosses(bw2):
 
     # cv2.circle(bw2, (x, y), 3, 255, -1)
     # step two: create border for the points
-    bw3 = cv2.dilate(bw2, kernel, iterations=2)
+    bw3 = cv2.dilate(bw2, kernel, iterations=4)
     # step three: find the contour and draw them
     cnts, hier = cv2.findContours(bw3, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -83,6 +83,7 @@ def find_leaves_crosses(bw2):
     bw3_rgb = cv2.cvtColor(bw3, cv2.COLOR_GRAY2RGB)
     for corner in corners:
         x, y = corner.ravel()
+        rcs = []
         for corner2 in corners:
             x2, y2 = corner2.ravel()
             corner_lines = shapgeo.LineString(((x, y), (x2, y2)))
@@ -94,13 +95,20 @@ def find_leaves_crosses(bw2):
                 dy = (y2 - y)
                 dx = (x2 - x)
                 if (dx != 0):
-                    rc = abs(y2 - y) / abs(x2 - x)
-                    rcs.append(rc)
+                    rc = (y2 - y) / (x2 - x)
+                    angle = np.arctan(rc)
+                    # print(angle)
+                    rcs.append(angle)
                     cv2.line(bw3_rgb, (x, y), (x2, y2), (255, 0, 0))
+                else:
+                    rcs.append(1)
         # check if it is a corss point
-        if (np.max(rcs) - np.min(rcs)) > 2:
-            # print("draw poitn")
-            cv2.circle(bw2_rgb, (x, y), 5, (0, 0, 255), -1)
+        if len(rcs) > 0:
+            if (np.sum(angle)) < 1:
+                # print("draw poitn")
+                cv2.circle(bw2_rgb, (x, y), 5, (0, 0, 255), -1)
+                cv2.putText(bw2_rgb, str(np.sum(np.round(angle, 2))), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
+                            (0, 0, 255), 1)
 
     print(i)
     cv2.drawContours(bw3_rgb, cnts, -1, (0, 255, 0), 1)
