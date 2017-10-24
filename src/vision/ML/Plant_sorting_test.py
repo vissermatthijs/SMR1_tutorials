@@ -73,9 +73,11 @@ class WebcamVideoStream:
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
                 return
-
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.stream.read()
+            self.frame_small = imutils.resize(self.frame, width=400)
+            cv2.imshow("Frame_small", self.frame_small)
+            key = cv2.waitKey(1) & 0xFF
 
     def read(self):
         # return the frame most recently read
@@ -379,7 +381,7 @@ while fps._numFrames < 100:
     fps.update()
 
 # stop the timer and display FPS information
-# print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+#print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 #print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
 while True:
