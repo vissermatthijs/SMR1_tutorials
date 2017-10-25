@@ -1,4 +1,7 @@
 <launch>
+    <include file="$(find ur_bringup)/launch/moveit_rviz.launch" >
+        <arg name="config" value="true" />
+    </include>
 
     <include file="$(find smr1_moveit_config)/launch/myworkcell_moveit_planning_execution.launch">
     </include>

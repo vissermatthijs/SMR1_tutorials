@@ -3,9 +3,9 @@ import cv2
 import datetime
 import os
 
-ser = serial.Serial('/dev/cu.usbmodem1421', 9600)
 
-cam = cv2.VideoCapture(0)
+ser = serial.Serial('/dev/ttyACM0', 9600)
+
 
 cv2.namedWindow("frame")
 cv2.moveWindow("frame", 600, 300)
@@ -23,9 +23,8 @@ while True:
 
 
     if ser.readline() == b'1\r\n':
-        ret, frame = cam.read()
 
-        show(frame)
+        frame = bridge.imgmsg_to_cv2(image_message, desired_encoding="passthrough")
         wait  = 0
         img_type = ""
 
