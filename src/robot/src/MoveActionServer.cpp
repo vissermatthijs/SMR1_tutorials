@@ -30,6 +30,7 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
     if(goal->type == 0) {
         this->planner.manualPose("home");
     } else if(goal->type == 1) {
+
         this->planner.manualPose("pickup_step1");
         this->planner.manualPose("pickup_step2");
         this->planner.manualPose("pickup_step3");
@@ -38,7 +39,6 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
         //this->planner.pushConstraintFromCurrentOrientation();
         this->planner.manualPose("place_bin1");
         //this->planner.popCurrentConstraint();
-
 
 
         // Get current pose
