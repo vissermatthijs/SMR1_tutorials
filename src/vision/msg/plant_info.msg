@@ -1,2 +1,1 @@
-float64 height
-int64 leaves
+int64 category

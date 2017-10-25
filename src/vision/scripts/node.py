@@ -16,6 +16,8 @@ from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from xgboost import XGBClassifier
 
+from vision.msg import plant_info
+
 class WebcamVideoStream:
     def __init__(self, src=1, frame_name=""):
         # initialize the video camera stream and read the first frame
@@ -54,7 +56,6 @@ class WebcamVideoStream:
     def stop(self):
         # indicate that the thread should be stopped
         self.stopped = True
-
 
 ### Parse command-line argumentss
 def options():
@@ -408,6 +409,7 @@ def show(frame, info, x, y, height_plant, frame_name):
 
 def talker():
     rospy.init_node('vision', anonymous=True)
+    pub = rospy.Publisher('vision', plant_info, queue_size=10)
     rate = rospy.Rate(10) # 10hz
 
     model, scaler = train_model()
@@ -438,6 +440,7 @@ def talker():
                     print(y_pred)
                     info_top = info_top + "Yucca_type =" + str(int(y_pred[0][0]) + 1) + "   "
                     info_top = info_top + "ROI = OK"
+                    pub.publish(category=(int(y_pred[0][0]) + 1))
                 if A == -1:
                     print("error: no plant found top")
                     info_top = info_top + "ROI = -1"
@@ -449,6 +452,7 @@ def talker():
                 print("plant to small")
                 info_side = info_side + "height = to small"
                 info_top = info_top + "to small"
+                pub.publish(category=-1)
             print(info_side)
             print(info_top)
             show(image_top, info_top, 0.35, 0.35, 0, frame_name="pic_top")

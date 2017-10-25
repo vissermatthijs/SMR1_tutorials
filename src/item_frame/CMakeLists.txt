@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
         tf
         plc
         robot
+        vision
 )
 
 ## System dependencies are found with CMake's conventions
@@ -108,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES item_frame
-  CATKIN_DEPENDS actionlib_msgs roscpp message_runtime tf plc robot
+  CATKIN_DEPENDS actionlib_msgs roscpp message_runtime tf plc robot vision
 #  DEPENDS system_lib
 )
 

@@ -10,11 +10,16 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <robot/MovePlantAction.h>
+#include <vision/plant_info.h>
+
+#include <queue>
 
 tf::TransformBroadcaster *br = nullptr;
 bool _switch = false;
 bool _switchTestMode = false;
 int _switchMoveBase = -1;
+
+std::queue<int> plant_queue;
 
 void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 {
@@ -30,14 +35,21 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
             _switchTestMode = true;
             goal.type = 1;
         } else if(msg->ir) {
-            _switch = true;
-            goal.type = 1;
+            if(!plant_queue.empty()) {
+                _switch = true;
+                goal.type = plant_queue.front();
+                plant_queue.pop();
+            } else {
+                ROS_ERROR("Error: plant queue not in sync!!");
+                return;
+            }
         } else if(msg->move_base) {
             goal.type = 0;
             _switchMoveBase = msg->move_base;
         } else {
             return;
         }
+
 
         ROS_INFO("item_frame: creating action client");
         static actionlib::SimpleActionClient<robot::MovePlantAction> ac("MovePlant", true);
@@ -66,6 +78,12 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 
 }
 
+void visionCallback(const vision::plant_info::ConstPtr& msg) {
+    if(msg->category > 0) {
+        plant_queue.push(msg->category);
+    }
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "item_frame");
@@ -79,6 +97,7 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(1);
 
     ros::Subscriber sub = nh.subscribe("plc_sensors", 1000, sensorCallback);
+    ros::Subscriber sub2 = nh.subscribe("vision", 1000, visionCallback);
 
     while (ros::ok()) {
 

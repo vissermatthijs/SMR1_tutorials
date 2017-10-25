@@ -21,7 +21,7 @@ def callAction(_type, _x, _y, _z):
 
 
 def callback(data):
-    print data
+    callAction(data.msg, 0, 0, 0)
 
 def listener():
 
