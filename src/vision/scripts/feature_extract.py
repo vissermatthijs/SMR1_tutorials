@@ -35,7 +35,7 @@ def main():
     device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
-                                                  pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
+                                                  pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_4/naive_bayes_pdfs.txt",
                                                   device=0, debug='print')
 
     # Median Filter
