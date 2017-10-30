@@ -1,1 +1,1 @@
-int64 category
+int32 category

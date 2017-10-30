@@ -69,22 +69,27 @@ def options():
     return args
 
 ### Main pipeline
+
+def get_feature(img):
+
+
 def get_feature(img):
     #print("step one")
     """
     Step one: Background forground substraction
     """
+    args = options()
     # Get options
-    debug = 'print'
+    debug = args.debug
     # Read image
-    filename = 'result'
+    filename = args.result
     # img, path, filename = pcv.readimage(args.image)
     # Pipeline step
     device = 0
     device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
-                                                  pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_4/naive_bayes_pdfs.txt",
+                                                  pdf_file="./home/pieter/SMR1/src/vision/ML_background/Trained_models/model_4/naive_bayes_pdfs.txt",
                                                   device=0, debug='print')
 
     # Median Filter
@@ -157,100 +162,98 @@ def get_feature(img):
     """
     Step three: Calculate all the features if object is found
     """
-    if obj != None:
-        if len(obj) > 0:
-            # Find shape properties, output shape image (optional)
-            device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device,
-                                                                             debug
-                                                                             )
+    if len(obj) > 0:
+        # Find shape properties, output shape image (optional)
+        device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device,
+                                                                         debug
+                                                                         )
 
-            # Shape properties relative to user boundary line (optional)
-            device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(resize_img, args.image, obj, mask,
-                                                                                      1680,
-                                                                                      device
-                                                                                      )
+        # Shape properties relative to user boundary line (optional)
+        device, boundary_header, boundary_data, boundary_img1 = pcv.analyze_bound(resize_img, args.image, obj, mask,
+                                                                                  1680,
+                                                                                  device
+                                                                                  )
 
-            # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
-            device, color_header, color_data, color_img = pcv.analyze_color(resize_img, args.image, kept_mask, 256,
-                                                                            device,
-                                                                            debug,
-                                                                            'all', 'v', 'img', 300
-                                                                            )
+        # Determine color properties: Histograms, Color Slices and Pseudocolored Images, output color analyzed images (optional)
+        device, color_header, color_data, color_img = pcv.analyze_color(resize_img, args.image, kept_mask, 256,
+                                                                        device,
+                                                                        debug,
+                                                                        'all', 'v', 'img', 300
+                                                                        )
 
-            maks_watershed = mask.copy()
-            kernel = np.zeros((5, 5), dtype=np.uint8)
-            device, mask_watershed, = pcv.erode(maks_watershed, 5, 1, device, debug)
+        maks_watershed = mask.copy()
+        kernel = np.zeros((5, 5), dtype=np.uint8)
+        device, mask_watershed, = pcv.erode(maks_watershed, 5, 1, device, debug)
 
-            device, watershed_header, watershed_data, analysis_images = pcv.watershed_segmentation(device, resize_img,
-                                                                                                   mask, 50,
-                                                                                                   './examples', debug)
-            device, list_of_acute_points = pcv.acute_vertex(obj, 30, 60, 10, resize_img, device, debug)
+        device, watershed_header, watershed_data, analysis_images = pcv.watershed_segmentation(device, resize_img,
+                                                                                               mask, 50,
+                                                                                               './examples', debug)
+        device, list_of_acute_points = pcv.acute_vertex(obj, 30, 60, 10, resize_img, device, debug)
 
-            device, top, bottom, center_v = pcv.x_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
+        device, top, bottom, center_v = pcv.x_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
 
-            device, left, right, center_h = pcv.y_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
+        device, left, right, center_h = pcv.y_axis_pseudolandmarks(obj, mask, resize_img, device, debug)
 
-            device, points_rescaled, centroid_rescaled, bottomline_rescaled = pcv.scale_features(obj, mask,
-                                                                                                 list_of_acute_points,
-                                                                                                 225,
-                                                                                                 device, debug)
+        device, points_rescaled, centroid_rescaled, bottomline_rescaled = pcv.scale_features(obj, mask,
+                                                                                             list_of_acute_points,
+                                                                                             225,
+                                                                                             device, debug)
 
-            # Identify acute vertices (tip points) of an object
-            # Results in set of point values that may indicate tip points
-            device, vert_ave_c, hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b = pcv.landmark_reference_pt_dist(
-                points_rescaled, centroid_rescaled, bottomline_rescaled, device, debug)
+        # Identify acute vertices (tip points) of an object
+        # Results in set of point values that may indicate tip points
+        device, vert_ave_c, hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b = pcv.landmark_reference_pt_dist(
+            points_rescaled, centroid_rescaled, bottomline_rescaled, device, debug)
 
-            landmark_header = ['HEADER_LANDMARK', 'tip_points', 'tip_points_r', 'centroid_r', 'baseline_r',
-                               'tip_number',
-                               'vert_ave_c',
-                               'hori_ave_c', 'euc_ave_c', 'ang_ave_c', 'vert_ave_b', 'hori_ave_b', 'euc_ave_b',
-                               'ang_ave_b',
-                               'left_lmk', 'right_lmk', 'center_h_lmk', 'left_lmk_r', 'right_lmk_r', 'center_h_lmk_r',
-                               'top_lmk', 'bottom_lmk', 'center_v_lmk', 'top_lmk_r', 'bottom_lmk_r', 'center_v_lmk_r']
-            landmark_data = ['LANDMARK_DATA', 0, 0, 0, 0, len(list_of_acute_points), vert_ave_c,
-                             hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b, 0, 0, 0, 0,
-                             0, 0,
-                             0, 0, 0, 0, 0, 0]
-            shape_data_train = list(shape_data)
-            shape_data_train.pop(0)
-            shape_data_train.pop(10)
-            watershed_data_train = list(watershed_data)
-            watershed_data_train.pop(0)
-            landmark_data_train = [len(list_of_acute_points), vert_ave_c,
-                                   hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b]
-            X = shape_data_train + watershed_data_train + landmark_data_train
-            # print("len X", len(X))
-            # print(X)
-            # Write shape and color data to results fil
-            result = open(args.result, "a")
-            result.write('\t'.join(map(str, shape_header)))
+        landmark_header = ['HEADER_LANDMARK', 'tip_points', 'tip_points_r', 'centroid_r', 'baseline_r',
+                           'tip_number',
+                           'vert_ave_c',
+                           'hori_ave_c', 'euc_ave_c', 'ang_ave_c', 'vert_ave_b', 'hori_ave_b', 'euc_ave_b',
+                           'ang_ave_b',
+                           'left_lmk', 'right_lmk', 'center_h_lmk', 'left_lmk_r', 'right_lmk_r', 'center_h_lmk_r',
+                           'top_lmk', 'bottom_lmk', 'center_v_lmk', 'top_lmk_r', 'bottom_lmk_r', 'center_v_lmk_r']
+        landmark_data = ['LANDMARK_DATA', 0, 0, 0, 0, len(list_of_acute_points), vert_ave_c,
+                         hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b, 0, 0, 0, 0,
+                         0, 0,
+                         0, 0, 0, 0, 0, 0]
+        shape_data_train = list(shape_data)
+        shape_data_train.pop(0)
+        shape_data_train.pop(10)
+        watershed_data_train = list(watershed_data)
+        watershed_data_train.pop(0)
+        landmark_data_train = [len(list_of_acute_points), vert_ave_c,
+                               hori_ave_c, euc_ave_c, ang_ave_c, vert_ave_b, hori_ave_b, euc_ave_b, ang_ave_b]
+        X = shape_data_train + watershed_data_train + landmark_data_train
+        # print("len X", len(X))
+        # print(X)
+        # Write shape and color data to results fil
+        result = open(args.result, "a")
+        result.write('\t'.join(map(str, shape_header)))
+        result.write("\n")
+        result.write('\t'.join(map(str, shape_data)))
+        result.write("\n")
+        result.write('\t'.join(map(str, watershed_header)))
+        result.write("\n")
+        result.write('\t'.join(map(str, watershed_data)))
+        result.write("\n")
+        result.write('\t'.join(map(str, landmark_header)))
+        result.write("\n")
+        result.write('\t'.join(map(str, landmark_data)))
+        result.write("\n")
+        for row in shape_img:
+            result.write('\t'.join(map(str, row)))
             result.write("\n")
-            result.write('\t'.join(map(str, shape_data)))
+        result.write('\t'.join(map(str, color_header)))
+        result.write("\n")
+        result.write('\t'.join(map(str, color_data)))
+        result.write("\n")
+        for row in color_img:
+            result.write('\t'.join(map(str, row)))
             result.write("\n")
-            result.write('\t'.join(map(str, watershed_header)))
-            result.write("\n")
-            result.write('\t'.join(map(str, watershed_data)))
-            result.write("\n")
-            result.write('\t'.join(map(str, landmark_header)))
-            result.write("\n")
-            result.write('\t'.join(map(str, landmark_data)))
-            result.write("\n")
-            for row in shape_img:
-                result.write('\t'.join(map(str, row)))
-                result.write("\n")
-            result.write('\t'.join(map(str, color_header)))
-            result.write("\n")
-            result.write('\t'.join(map(str, color_data)))
-            result.write("\n")
-            for row in color_img:
-                result.write('\t'.join(map(str, row)))
-                result.write("\n")
-            result.close()
-            return 0, X
-        else:
-            return -1, 0
+        result.close()
+        return 0, X
     else:
         return -1, 0
+
         # print("done")
 
 def get_height(img):
@@ -269,7 +272,7 @@ def get_height(img):
     device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
-                                                  pdf_file="/home/matthijs/PycharmProjects/SMR1/src/vision/ML_background/Trained_models/model_3/naive_bayes_pdfs.txt",
+                                                  pdf_file="./home/pieter/SMR1/src/vision/ML_background/Trained_models/model_4/naive_bayes_pdfs.txt",
                                                   device=0, debug='print')
 
     # Median Filter
@@ -329,21 +332,21 @@ def get_height(img):
     # Decide which objects to keep
     device, roi_objects, hierarchy3, kept_mask, obj_area = pcv.roi_objects(resize_img, 'cutto', roi1, roi_hierarchy,
                                                                            id_objects, obj_hierarchy, device,
-                                                                           debug=None)
+                                                                debug=None)
     # Object combine kept objects
     device, obj, mask = pcv.object_composition(resize_img, roi_objects, hierarchy3, device, debug=None)
     ############### Analysis ################
-    if obj != None:
+    try:
         if len(obj) > 0:
             # Find shape properties, output shape image (optional)
             device, shape_header, shape_data, shape_img = pcv.analyze_object(resize_img, args.image, obj, mask, device,
-                                                                             debug
-                                                                             )
+                                                                         debug
+                                                                         )
             # cv2.waitKey(10000)
             return shape_data[6]
         else:
             return -1
-    else:
+    except:
         return -1
 
 def train_model():
@@ -356,7 +359,7 @@ def train_model():
     data = []
     target = []
 
-    with open('plant_db.csv') as csvfile:
+    with open('/home/pieter/SMR1/src/vision/scripts/plant_db.csv') as csvfile:
         dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in dataset:
             data.append(row[1:])
@@ -413,15 +416,16 @@ def talker():
     rate = rospy.Rate(10) # 10hz
 
     model, scaler = train_model()
-    ser = serial.Serial('/dev/ttyACM0', 9600)
+    ser = serial.Serial('/dev/ttyACM1', 9600)
 
     print("[INFO] sampling THREADED frames from webcam...")
-    vs = WebcamVideoStream(src=2, frame_name="top").start()
-    vs_2 = WebcamVideoStream(src=3, frame_name="side").start()
+    vs = WebcamVideoStream(src=1, frame_name="top").start()
+    vs_2 = WebcamVideoStream(src=2, frame_name="side").start()
 
     while not rospy.is_shutdown():
 
         if ser.readline() == b'1\r\n':
+            """
             # check the height
             image_top = vs.read()
             image_side = vs_2.read()
@@ -430,7 +434,7 @@ def talker():
             print("Height", height)
             info_top = ""
             info_side = ""
-            if height >= 70:
+            if height <= 70:
                 A, X = get_feature(image_top)
                 info_side = info_side + "height = OK"
                 if A == 0:
@@ -448,15 +452,17 @@ def talker():
                 print("error: no plant found side")
                 info_side = info_side + "height = -1"
                 info_top = info_top + "error"
-            if height < 90:
+            if height > 70:
                 print("plant to small")
                 info_side = info_side + "height = to small"
                 info_top = info_top + "to small"
                 pub.publish(category=-1)
             print(info_side)
             print(info_top)
-            show(image_top, info_top, 0.35, 0.35, 0, frame_name="pic_top")
-            show(image_side, info_side, 0.7, 0.7, height, frame_name="pic_side")
+        #    show(image_top, info_top, 0.35, 0.35, 0, frame_name="pic_top")
+        #    show(image_side, info_side, 0.7, 0.7, height, frame_name="pic_side")
+            """
+            pub.publish(category=1)
             ser.reset_input_buffer()
 
         #pub.publish(hello_str)
