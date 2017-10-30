@@ -22,8 +22,9 @@ public:
 private:
     const std::string name;
 
-    std::pair<int,int> counter[3];
-    const float distance;
+    std::pair<int,int> counter[4];
+    float distance;
+    int middleCounter;
 
     actionlib::SimpleActionServer<robot::MovePlantAction> as_;
     robot::MovePlantResult result;

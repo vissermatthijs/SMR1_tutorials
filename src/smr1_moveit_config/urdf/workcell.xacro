@@ -15,7 +15,7 @@
     <joint name="env_to_robot" type="fixed">
         <parent link="world"/>
         <child link="base_link"/>
-        <origin xyz="0.085 0.355 0.880" rpy="0 0 3.14"/>
+        <origin xyz="0.0 0.0 0.880" rpy="0 0 3.14"/>
     </joint>
 
     <joint name="eoat_to_tool0" type="fixed">
@@ -30,7 +30,7 @@
             <geometry>
                 <mesh filename="package://smr1_moveit_config/urdf/Conveyor_belt.stl"/>
             </geometry>
-            <origin xyz="-0.73 -0.02 0.666" rpy="1.57 0 0.0" />
+            <origin xyz="-1.265 0.61 0.666" rpy="1.57 0 0.0" />
             <material name="blue" />
         </visual>
 
@@ -38,14 +38,14 @@
             <geometry>
                 <box size="3.01 0.44 0.860"/>
             </geometry>
-                <origin xyz="-0.73 -0.22 0.3225" rpy="0 0 0.0" />
+                <origin xyz="-1.265 0.41 0.3225" rpy="0 0 0.0" />
         </collision>
 
         <visual>
             <geometry>
-                <mesh filename="package://smr1_moveit_config/urdf/Tafel.stl"/>
+                <box size="2.0 0.70 0.860"/>
             </geometry>
-            <origin xyz="1.0 0.35 0" rpy="0 0 3.14" />
+            <origin xyz="0.0 -0.225 0.43" rpy="0 0 0" />
             <material name="blue" />
         </visual>
 
@@ -53,14 +53,14 @@
             <geometry>
                 <box size="2.0 0.70 0.860"/>
             </geometry>
-            <origin xyz="1.0 0.35 0.43" rpy="0 0 0.0" />
+            <origin xyz="0.0 -0.225 0.44" rpy="0 0 0.0" />
         </collision>
 
         <visual>
             <geometry>
                 <box size="4.0 0.10 3.0"/>
             </geometry>
-            <origin xyz="0.0 0.76 1.5" rpy="0 0 0" />
+            <origin xyz="0.0 0.73 1.5" rpy="0 0 0" />
             <material name="blue" />
         </visual>
 
@@ -68,38 +68,69 @@
             <geometry>
                 <box size="4.0 0.10 3.0"/>
             </geometry>
-            <origin xyz="0.0 -0.55 1.5" rpy="0 0 0" />
+            <origin xyz="0.0 0.73 1.5" rpy="0 0 0" />
         </collision>
+        <visual>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
+            </geometry>
+            <origin xyz="-0.75 0.09 0.86" rpy="1.57 0.0 0.0" />
+            <material name="blue" />
+        </visual>
 
         <collision>
-                    <geometry>
-                        <box size="4.0 0.10 3.0"/>
-                    </geometry>
-                    <origin xyz="0.0 0.76 1.5" rpy="0 0 0" />
-                </collision>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
+            </geometry>
+            <origin xyz="-0.75 0.09 0.86" rpy="1.57 0.0 0.0" />
+        </collision>
+
+        <visual>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
+            </geometry>
+            <origin xyz="0.50 0.09 0.86" rpy="1.57 0.0 0.0" />
+            <material name="blue" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
+            </geometry>
+            <origin xyz="0.50 0.09 0.86" rpy="1.57 0.0 0.0" />
+        </collision>
+
+        <visual>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
+            </geometry>
+            <origin xyz="-0.285 -0.545 0.86" rpy="1.57 0.0 1.57" />
+            <material name="blue" />
+        </visual>
+
+        <collision>
+            <geometry>
+                <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
+            </geometry>
+            <origin xyz="-0.285 -0.545 0.86" rpy="1.57 0.0 1.57" />
+        </collision>
+
+
     </link>
 
     <link name="eoat">
         <visual>
             <geometry>
-                <mesh filename="package://smr1_moveit_config/urdf/eoat.stl" />
+                <mesh filename="package://smr1_moveit_config/urdf/eoat_v2.stl" />
             </geometry>
-             <origin xyz="0 0 0" rpy="0 0 0.78" />
+             <origin xyz="0 0 0.17" rpy="-1.57 0 -2.35" />
             <material name="white" />
         </visual>
     </link>
-
-    <link name="camera_frame"/>
 
     <joint name="world_to_env" type="fixed">
         <parent link="world" />
         <child link ="env" />
         <origin xyz="0 0 0" rpy="0 0 0" />
-    </joint>
-
-    <joint name="world_to_camera" type="fixed">
-        <parent link="world"/>
-        <child link="camera_frame"/>
-        <origin xyz="-0.25 -0.5 1.25" rpy="0 3.14159 0"/>
     </joint>
 </robot>
