@@ -22,13 +22,13 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
     counter[1].first = 0;
     counter[1].second = 0;
 
-    counter[2].first = -1;
-    counter[2].second = 0;
+    counter[2].first = 0;
+    counter[2].second = -1;
 
     counter[3].first = 0;
     counter[3].second = 1;
 
-    this->middleCounter = 0;
+    this->middleCounter = 8;
     this->distance = 0.115f;
 }
 
@@ -99,7 +99,10 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
             } else if(this->middleCounter == 9) {
                 this->planner.manualPose("place_bin2_2");
+
                 p = this->planner.getCurrentPose();
+                p.position.y += distance;
+                this->planner.manualPose(p);
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
@@ -117,15 +120,15 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
                 this->planner.manualPose("place_bin2_1");
                 p = this->planner.getCurrentPose();
 
-                counter[2].first++;
-                counter[2].second = 0;
-                p.position.y -= counter[2].first * distance;
+                counter[2].first = 0;
+                counter[2].second++;
+                p.position.y += counter[2].first * distance;
                 p.position.x -= counter[2].second * distance;
                 this->planner.manualPose(p);
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.0f;
+                p.position.z -= 0.10f;
                 this->planner.manualPose(p);
 
                 p.position.x -= 0.15f;
@@ -138,14 +141,14 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
                 this->planner.manualPose("place_bin2_1");
                 p = this->planner.getCurrentPose();
 
-                counter[2].second = 1;
-                p.position.y -= counter[2].first * distance;
+                counter[2].first = 1;
+                p.position.y += counter[2].first * distance;
                 p.position.x -= counter[2].second * distance;
                 this->planner.manualPose(p);
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.0f;
+                p.position.z -= 0.10f;
                 this->planner.manualPose(p);
 
                 //this->planner.pushConstraintFromCurrentOrientation();
