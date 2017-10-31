@@ -33,7 +33,7 @@ void sensorCallback(const plc::sensor_info::ConstPtr& msg)
 
         if(msg->test_mode) {
             _switchTestMode = true;
-            goal.type = 3;
+            goal.type = 1;
         } else if(msg->ir) {
             if(!plant_queue.empty()) {
                 _switch = true;

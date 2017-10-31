@@ -16,7 +16,7 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
     this->as_.start();
 
 
-    counter[0].first = 1;
+    counter[0].first = 0;
     counter[0].second = 0;
 
     counter[1].first = 0;
@@ -28,7 +28,7 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
     counter[3].first = 0;
     counter[3].second = 0;
 
-    this->middleCounter = 8;
+    this->middleCounter = 0;
     this->distance = 0.115f;
 }
 
@@ -71,8 +71,14 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             counter[1].first++;
 
             if(counter[1].first > 4) {
-                counter[1].first = 0;
-                counter[1].second = 1;
+                if (counter[1].second == 0){
+                    counter[1].first = 0;
+                    counter[1].second = 1;
+                } else{
+                    counter[1].first = 0;
+                    counter[1].second = 0;
+                }
+
             }
 
         } else if(goal->type == 2) {
@@ -80,6 +86,8 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
             if(this->middleCounter > 9) {
                 this->middleCounter = 0;
+                counter[2].first=0;
+                counter[2].second=-1;
             }
 
             if(this->middleCounter == 8) {
@@ -167,9 +175,18 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             if (counter[3].first == 0 && counter[3].second == 1) {
                 this->planner.manualPose("place_bin3_2");
                 p = this->planner.getCurrentPose();
-            } else {
+            } else if (counter[3].first <=1){
                 this->planner.manualPose("place_bin3_1");
 
+                p = this->planner.getCurrentPose();
+
+                std::cout << "PRE PLACE BIN 3 X:" << counter[3].first << " Y:" << counter[3].second << std::endl;
+                p.position.y += counter[3].first * this->distance;
+                p.position.x -= counter[3].second * this->distance;
+                //Move to empty space in tray
+                this->planner.manualPose(p);
+            } else {
+                this->planner.manualPose("place_bin3_3");
                 p = this->planner.getCurrentPose();
 
                 std::cout << "PRE PLACE BIN 3 X:" << counter[3].first << " Y:" << counter[3].second << std::endl;
@@ -188,9 +205,11 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             //remove eoat from plant
             if(counter[3].first == 0 && counter[3].second == 1) {
                 p.position.y += 0.125f;
-            } else {
+            } else if (counter[3].first <=1){
                 p.position.x -= 0.125f;
                 p.position.y += 0.125f;
+            } else {
+                p.position.x -= 0.125f;
             }
 
             this->planner.manualPose(p);
@@ -201,9 +220,16 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             counter[3].first++;
 
             if(counter[3].first > 4) {
-                counter[3].first = 0;
-                counter[3].second = 1;
+                if (counter[3].second == 0){
+                    counter[3].first = 0;
+                    counter[3].second = 1;
+                } else{
+                    counter[3].first = 0;
+                    counter[3].second = 0;
+                }
+
             }
+
         }
 
         this->planner.manualPose("home");

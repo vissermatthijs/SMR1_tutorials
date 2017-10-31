@@ -69,10 +69,6 @@ def options():
     return args
 
 ### Main pipeline
-
-def get_feature(img):
-
-
 def get_feature(img):
     #print("step one")
     """
@@ -89,7 +85,7 @@ def get_feature(img):
     device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
-                                                  pdf_file="./home/pieter/SMR1/src/vision/ML_background/Trained_models/model_4/naive_bayes_pdfs.txt",
+                                                  pdf_file="./../ML_background/Trained_models/model_5/naive_bayes_pdfs.txt",
                                                   device=0, debug='print')
 
     # Median Filter
@@ -272,7 +268,7 @@ def get_height(img):
     device, resize_img = pcv.resize(img, 0.4, 0.4, device, debug)
     # Classify the pixels as plant or background
     device, mask_img = pcv.naive_bayes_classifier(resize_img,
-                                                  pdf_file="./home/pieter/SMR1/src/vision/ML_background/Trained_models/model_4/naive_bayes_pdfs.txt",
+                                                  pdf_file="./../ML_background/Trained_models/model_6/naive_bayes_pdfs.txt",
                                                   device=0, debug='print')
 
     # Median Filter
@@ -353,13 +349,13 @@ def train_model():
     # ____variables____
     #print('training model....')
     seed = 5  # random_state
-    test_size = 0.21  # test_size
+    test_size = 0.1  # test_size
     n_components = 3  # LDA components
 
     data = []
     target = []
 
-    with open('/home/pieter/SMR1/src/vision/scripts/plant_db.csv') as csvfile:
+    with open('plant_db_v2.csv') as csvfile:
         dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in dataset:
             data.append(row[1:])
@@ -416,7 +412,7 @@ def talker():
     rate = rospy.Rate(10) # 10hz
 
     model, scaler = train_model()
-    ser = serial.Serial('/dev/ttyACM1', 9600)
+    ser = serial.Serial('/dev/ttyACM0', 9600)
 
     print("[INFO] sampling THREADED frames from webcam...")
     vs = WebcamVideoStream(src=1, frame_name="top").start()
@@ -425,7 +421,6 @@ def talker():
     while not rospy.is_shutdown():
 
         if ser.readline() == b'1\r\n':
-            """
             # check the height
             image_top = vs.read()
             image_side = vs_2.read()
@@ -434,7 +429,7 @@ def talker():
             print("Height", height)
             info_top = ""
             info_side = ""
-            if height <= 70:
+            if height >= 70:
                 A, X = get_feature(image_top)
                 info_side = info_side + "height = OK"
                 if A == 0:
@@ -452,7 +447,7 @@ def talker():
                 print("error: no plant found side")
                 info_side = info_side + "height = -1"
                 info_top = info_top + "error"
-            if height > 70:
+            if height < 70:
                 print("plant to small")
                 info_side = info_side + "height = to small"
                 info_top = info_top + "to small"
@@ -461,8 +456,6 @@ def talker():
             print(info_top)
         #    show(image_top, info_top, 0.35, 0.35, 0, frame_name="pic_top")
         #    show(image_side, info_side, 0.7, 0.7, height, frame_name="pic_side")
-            """
-            pub.publish(category=1)
             ser.reset_input_buffer()
 
         #pub.publish(hello_str)
