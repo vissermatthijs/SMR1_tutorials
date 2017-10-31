@@ -8,8 +8,8 @@ import cv2
 yucca1 = 'cam1_17-12-10_yucca1_'
 yucca2 = 'cam1_17-12-10_yucca2_'
 yucca3 = 'cam1_17-12-10_yucca3_'
-yuccu_dir = ("/home/matthijs/Plant_db/run4/yucca1/*.jpg", "/home/matthijs/Plant_db/run4/yucca2/*.jpg",
-             "/home/matthijs/Plant_db/run4/yucca3/*.jpg")
+yuccu_dir = ("/home/matthijs/Plant_db/run5/yucca1/*.jpg", "/home/matthijs/Plant_db/run5/yucca2/*.jpg",
+             "/home/matthijs/Plant_db/run5/yucca3/*.jpg")
 count = 0
 i = 0
 for dir in yuccu_dir:

@@ -1,9 +1,9 @@
 import csv
 import sqlite3
 
-csvWriter = csv.writer(open("plant_db_v2.csv", "w"))
+csvWriter = csv.writer(open("plant_db_v4.csv", "w"))
 
-conn = sqlite3.connect('scripts/plant_db_1_v5')
+conn = sqlite3.connect('plant_db_1_v6')
 c = conn.cursor()
 c.execute('SELECT * from features')
 
@@ -17,7 +17,7 @@ for row in rows:
     # do your stuff
     csvWriter.writerow(rowindex)
 
-conn = sqlite3.connect('scripts/plant_db_2_v5')
+conn = sqlite3.connect('plant_db_2_v6')
 c = conn.cursor()
 c.execute('SELECT * from features')
 
@@ -31,7 +31,7 @@ for row in rows:
     # do your stuff
     csvWriter.writerow(rowindex)
 
-conn = sqlite3.connect('scripts/plant_db_3_v5')
+conn = sqlite3.connect('plant_db_3_v6')
 c = conn.cursor()
 c.execute('SELECT * from features')
 

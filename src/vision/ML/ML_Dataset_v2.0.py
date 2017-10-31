@@ -10,13 +10,13 @@ from xgboost import XGBClassifier
 # ____variables____
 
 seed = 5 #random_state
-test_size = 0.1  # test_size
+test_size = 50  # test_size
 n_components = 3 #LDA components
 
 data=[]
 target=[]
 
-with open('plant_db_v2.csv') as csvfile:
+with open('plant_db_v4.csv') as csvfile:
     dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in dataset:
         data.append(row[1:])

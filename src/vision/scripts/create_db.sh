@@ -14,6 +14,6 @@ time \
 -d /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/yucca_rename/yucca3 \
 -p /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/feature_extract.py \
 -a filename \
--s plant_db_3_v5 \
+-s plant_db_3_v6 \
 -f camera_timestamp_id_other \
 -T 10
