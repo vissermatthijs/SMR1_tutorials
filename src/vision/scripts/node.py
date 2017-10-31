@@ -355,7 +355,7 @@ def train_model():
     data = []
     target = []
 
-    with open('plant_db_v2.csv') as csvfile:
+    with open('plant_db_v4.csv') as csvfile:
         dataset = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in dataset:
             data.append(row[1:])
@@ -412,11 +412,11 @@ def talker():
     rate = rospy.Rate(10) # 10hz
 
     model, scaler = train_model()
-    ser = serial.Serial('/dev/ttyACM0', 9600)
+    ser = serial.Serial('/dev/ttyACM1', 9600)
 
     print("[INFO] sampling THREADED frames from webcam...")
-    vs = WebcamVideoStream(src=2, frame_name="top").start()
-    vs_2 = WebcamVideoStream(src=4, frame_name="side").start()
+    vs = WebcamVideoStream(src=1, frame_name="top").start()
+    vs_2 = WebcamVideoStream(src=3, frame_name="side").start()
 
     while not rospy.is_shutdown():
 

@@ -9,6 +9,22 @@
         <color rgba="1 1 1 1" />
     </material>
 
+    <material name="black">
+            <color rgba="0.1 0.1 0.1 1" />
+    </material>
+
+    <material name="gray">
+            <color rgba="0.7 0.7 0.7 1" />
+    </material>
+
+    <material name="yellow">
+            <color rgba="0.9 0.8 0.3 1" />
+    </material>
+
+    <material name="poster">
+            <texture filename="package://smr1_moveit_config/poster.png"/>
+    </material>
+
     <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
 
     <xacro:ur5_robot prefix="" joint_limited="true"/>
@@ -40,13 +56,23 @@
             </geometry>
                 <origin xyz="-1.265 0.41 0.3225" rpy="0 0 0.0" />
         </collision>
-
+    </link>
+    <link name="poster">
+        <visual>
+            <geometry>
+                <box size="1.5 1.059 0.0"/>
+            </geometry>
+             <origin xyz="2.0 0.0 -0.675" rpy="0 0 0" />
+            <material name="poster" />
+        </visual>
+    </link>
+    <link name="table">
         <visual>
             <geometry>
                 <box size="2.0 0.70 0.860"/>
             </geometry>
             <origin xyz="0.0 -0.225 0.43" rpy="0 0 0" />
-            <material name="blue" />
+            <material name="yellow" />
         </visual>
 
         <collision>
@@ -55,13 +81,14 @@
             </geometry>
             <origin xyz="0.0 -0.225 0.44" rpy="0 0 0.0" />
         </collision>
-
+    </link>
+    <link name="back_wall">
         <visual>
             <geometry>
                 <box size="4.0 0.10 3.0"/>
             </geometry>
             <origin xyz="0.0 0.73 1.5" rpy="0 0 0" />
-            <material name="blue" />
+            <material name="gray" />
         </visual>
 
         <collision>
@@ -70,12 +97,14 @@
             </geometry>
             <origin xyz="0.0 0.73 1.5" rpy="0 0 0" />
         </collision>
+    </link>
+    <link name="trays">
         <visual>
             <geometry>
                 <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
             </geometry>
             <origin xyz="-0.75 0.09 0.86" rpy="1.57 0.0 0.0" />
-            <material name="blue" />
+            <material name="black" />
         </visual>
 
         <collision>
@@ -90,7 +119,7 @@
                 <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
             </geometry>
             <origin xyz="0.50 0.09 0.86" rpy="1.57 0.0 0.0" />
-            <material name="blue" />
+            <material name="black" />
         </visual>
 
         <collision>
@@ -105,7 +134,7 @@
                 <mesh filename="package://smr1_moveit_config/urdf/tray.stl"/>
             </geometry>
             <origin xyz="-0.285 -0.545 0.86" rpy="1.57 0.0 1.57" />
-            <material name="blue" />
+            <material name="black" />
         </visual>
 
         <collision>
@@ -132,5 +161,28 @@
         <parent link="world" />
         <child link ="env" />
         <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="world_to_table" type="fixed">
+        <parent link="world" />
+        <child link ="table" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="world_to_back_wall" type="fixed">
+        <parent link="world" />
+        <child link ="back_wall" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="world_to_trays" type="fixed">
+        <parent link="world" />
+        <child link ="trays" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <joint name="world_to_poster" type="fixed">
+        <parent link="world" />
+        <child link ="poster" />
+        <origin xyz="0 0 0" rpy="0 -1.57 1.57" />
     </joint>
 </robot>
