@@ -10,7 +10,7 @@ from xgboost import XGBClassifier
 # ____variables____
 
 seed = 5 #random_state
-test_size = 0.21 #test_size
+test_size = 0.1  # test_size
 n_components = 3 #LDA components
 
 data=[]

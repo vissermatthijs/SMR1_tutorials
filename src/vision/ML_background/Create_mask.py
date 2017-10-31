@@ -26,7 +26,7 @@ def back_for_ground_sub(img, sliders):
     args = options()
     debug = args.debug
     stop = 0
-    sat_thresh = 85
+    sat_thresh = 90
     blue_thresh = 135
     green_magenta_dark_thresh = 124
     green_magenta_light_thresh = 180
@@ -157,7 +157,7 @@ def back_for_ground_sub(img, sliders):
 
     # Object combine kept objects
     device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug=False)
-    return device, ab_fill, mask_new, obj
+    return device, ab_fill, s_thresh, obj
 
 
 cv_img = []
