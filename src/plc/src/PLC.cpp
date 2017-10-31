@@ -24,6 +24,7 @@ PLC::PLC(std::string ip, ros::NodeHandle& nh) : rack(0), slot(1) {
     }
 
     sensor_pub = nh.advertise<plc::sensor_info>("plc_sensors", 1000);
+    vision_sub = nh.subscribe("vision", 1000, &PLC::setSkipPlant, this);
 }
 
 PLC::~PLC() {
@@ -102,4 +103,19 @@ void PLC::publishSensorData() {
     msg.move_base = reinterpret_cast<long>(this->getSensorValue(SENSORS::MOVE_BASE));
 
     sensor_pub.publish(msg);
+}
+
+void PLC::setSkipPlant(const vision::plant_info::ConstPtr& msg) {
+    ROS_INFO("SKIP PLANT");
+    if(msg->category == -1) {
+
+        int start = 0;
+        byte area = S7AreaMK;
+        int size = S7WLBit;
+        void *EB = (void*)(1);
+
+        int res=Client->ReadArea(area, 0, start, 1, size, &EB);
+
+        Check(res,"WriteArea");
+    }
 }
