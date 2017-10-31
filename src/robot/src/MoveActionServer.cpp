@@ -26,7 +26,7 @@ MoveActionServer::MoveActionServer(ros::NodeHandle &n) : planner(n, false),
     counter[2].second = -1;
 
     counter[3].first = 0;
-    counter[3].second = 1;
+    counter[3].second = 0;
 
     this->middleCounter = 8;
     this->distance = 0.115f;
@@ -162,25 +162,37 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             this->middleCounter++;
 
         } else if(goal->type >= 3) {
-            this->planner.manualPose("place_bin3");
-            geometry_msgs::Pose p = this->planner.getCurrentPose();
 
-            std::cout << "PRE PLACE BIN 3 X:" << counter[3].first << " Y:" << counter[3].second << std::endl;
-            p.position.y += counter[3].first * this->distance;
-            p.position.x -= counter[3].second * this->distance;
-            //Move to empty space in tray
-            this->planner.manualPose(p);
+            geometry_msgs::Pose p;
+            if (counter[3].first == 0 && counter[3].second == 1) {
+                this->planner.manualPose("place_bin3_2");
+                p = this->planner.getCurrentPose();
+            } else {
+                this->planner.manualPose("place_bin3_1");
 
+                p = this->planner.getCurrentPose();
+
+                std::cout << "PRE PLACE BIN 3 X:" << counter[3].first << " Y:" << counter[3].second << std::endl;
+                p.position.y += counter[3].first * this->distance;
+                p.position.x -= counter[3].second * this->distance;
+                //Move to empty space in tray
+                this->planner.manualPose(p);
+            }
             std::cout << "LOWERR PLANT" <<std::endl;
             //lower plant
-            p.position.z -= 0.20f;
+            p.position.z -= 0.30f;
             this->planner.manualPose(p);
             p.position.z -= 0.10f;
             this->planner.manualPose(p);
 
             //remove eoat from plant
-            p.position.x -= 0.15f;
-            p.position.y += 0.15f;
+            if(counter[3].first == 0 && counter[3].second == 1) {
+                p.position.y += 0.125f;
+            } else {
+                p.position.x -= 0.125f;
+                p.position.y += 0.125f;
+            }
+
             this->planner.manualPose(p);
 
             p.position.z += 0.40f;

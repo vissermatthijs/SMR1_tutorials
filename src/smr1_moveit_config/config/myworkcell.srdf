@@ -109,13 +109,21 @@
         <joint name="wrist_2_joint" value="0.4484" />
         <joint name="wrist_3_joint" value="-0.8166" />
     </group_state>
-    <group_state name="place_bin3" group="manipulator">
-        <joint name="elbow_joint" value="1.244" />
-        <joint name="shoulder_lift_joint" value="-1.237" />
-        <joint name="shoulder_pan_joint" value="2.567" />
-        <joint name="wrist_1_joint" value="-0.019" />
-        <joint name="wrist_2_joint" value="1.844" />
-        <joint name="wrist_3_joint" value="-0.746" />
+    <group_state name="place_bin3_2" group="manipulator">
+        <joint name="elbow_joint" value="0.7535" />
+        <joint name="shoulder_lift_joint" value="-1.0912" />
+        <joint name="shoulder_pan_joint" value="2.7237" />
+        <joint name="wrist_1_joint" value="0.4029" />
+        <joint name="wrist_2_joint" value="2.7520" />
+        <joint name="wrist_3_joint" value="-0.6939" />
+    </group_state>
+    <group_state name="place_bin3_1" group="manipulator">
+        <joint name="elbow_joint" value="1.0004" />
+        <joint name="shoulder_lift_joint" value="-1.2461" />
+        <joint name="shoulder_pan_joint" value="2.5131" />
+        <joint name="wrist_1_joint" value="0.2346" />
+        <joint name="wrist_2_joint" value="1.6461" />
+        <joint name="wrist_3_joint" value="-0.7962" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="eoat" parent_link="tool0" group="manipulator" />
