@@ -11,9 +11,9 @@
 
 time \
 /home/matthijs/plantcv/plantcv-pipeline.py \
--d /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/yucca_rename/yucca2 \
+-d /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/yucca_rename/yucca3 \
 -p /home/matthijs/PycharmProjects/SMR1/src/vision/scripts/feature_extract.py \
 -a filename \
--s plant_db_2_v4 \
+-s plant_db_3_v5 \
 -f camera_timestamp_id_other \
 -T 10

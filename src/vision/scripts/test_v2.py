@@ -2,7 +2,6 @@ import numpy as np
 import sys
 
 import cv2
-import shapely.geometry as shapgeo
 import weave
 
 
@@ -60,61 +59,80 @@ def find_leaves_crosses(bw2):
     points = []
     rcs = []
     # step one: find points
-    corners = cv2.goodFeaturesToTrack(bw2, maxCorners=300, qualityLevel=0.01, minDistance=20)
-    for corner in corners:
-        x, y = corner.ravel()
-        cv2.circle(bw2_rgb, (x, y), 3, (0, 255, 0), -1)
+    corners = cv2.goodFeaturesToTrack(bw2, maxCorners=300, qualityLevel=0.001, minDistance=30)
+    kernel = np.ones((8, 8), np.uint8)
+    ROI_scaled = cv2.dilate(bw2, kernel, iterations=5)
+    _, bw2 = cv2.threshold(bw2, 127, 255, cv2.THRESH_BINARY)
+    list = np.argwhere(bw2 == 255)
+    # print("list",list)
+    width, height = bw2.shape
+    print("width", width)
+    print("height", height)
+    for points in list:
+        # x, y = corner.ravel()
+        y = points[0]
+        x = points[1]
+        print("x", x)
+        print("y", y)
+
+        ROI = bw2[int(y - 10):int(y + 10), int(x - 10):int(x + 10)]
+
+        width, height = ROI.shape
+        if width * height > 0:
+            ROI_scaled = cv2.resize(ROI, (0, 0), fx=10, fy=10)
+
+            ROI_scaled = cv2.dilate(ROI_scaled, kernel, iterations=5)
+
+            ROI_scaled_border = cv2.copyMakeBorder(ROI_scaled, 10, 10, 10, 10, cv2.BORDER_CONSTANT,
+                                                   value=[255, 255, 255])
+
+            ROI_inv = cv2.bitwise_not(ROI_scaled_border)
+
+            _, ROI_inv = cv2.threshold(ROI_inv, 127, 255, cv2.THRESH_BINARY)
+
+            ROI_scaled2 = ROI_inv.copy()
+
+            cv2.imshow("INV", ROI_inv)
+
+            contours_inv, hierarchy = cv2.findContours(ROI_inv, mode=cv2.RETR_LIST,
+                                                       method=cv2.CHAIN_APPROX_SIMPLE)
+            contours, hierarchy = cv2.findContours(ROI_scaled, mode=cv2.RETR_LIST,
+                                                   method=cv2.CHAIN_APPROX_SIMPLE)
+
+            if len(contours_inv) > 2 and len(contours) == 1:
+                cv2.circle(bw2_rgb, (x, y), 3, (0, 255, 0), -1)
+                ROI_2 = bw2[int(y - 40):int(y + 40), int(x - 40):int(x + 40)]
+
+                ROI_2 = cv2.dilate(ROI_2, kernel, iterations=1)
+
+                ROI_scaled_border_2 = cv2.copyMakeBorder(ROI_2, 10, 10, 10, 10, cv2.BORDER_CONSTANT,
+                                                         value=[255, 255, 255])
+                ROI_inv_2 = cv2.bitwise_not(ROI_scaled_border_2)
+
+                _, ROI_inv_2 = cv2.threshold(ROI_inv_2, 127, 255, cv2.THRESH_BINARY)
+
+                ROI_inv3 = ROI_inv_2.copy()
+
+                contours_inv_2, hierarchy = cv2.findContours(ROI_inv_2, mode=cv2.RETR_LIST,
+                                                             method=cv2.CHAIN_APPROX_SIMPLE)
+                if len(contours_inv_2) > 4:
+                    cv2.circle(bw2_rgb, (int(x), int(y)), 3, (255, 0, 0), -1)
+                print("contour_2", len(contours_inv_2))
+                cv2.imshow("ROI_2", ROI_2)
+                cv2.imshow("Roi_2", ROI_inv3)
+                # cv2.waitKey(3000)
+                # if len(contours_inv) > 3 and len(contours) == 1:
+                # cv2.circle(bw2_rgb,(x, y), 3, (255,0,0), -1)
+
+            ROI_rgb = cv2.cvtColor(ROI_scaled2, cv2.COLOR_GRAY2RGB)
+            # cv2.drawContours(ROI_rgb, contours_inv, -1, (0, 255, 0), 3)
+
+            print(len(contours_inv))
+            # NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
+            # cv2.circle(bw2_rgb, (int(x),int(y)), 3, (255, 255, 0), -1)
     cv2.imshow('key_points', bw2_rgb)
-    cv2.waitKey(1000)
-    # corners = np.int0(corners)
-
-    # cv2.circle(bw2, (x, y), 3, 255, -1)
-    # step two: create border for the points
-    bw3 = cv2.dilate(bw2, kernel, iterations=4)
-    # step three: find the contour and draw them
-    cnts, hier = cv2.findContours(bw3, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    cnts_main = np.vstack(np.vstack(cnts))
-
-    cnts_lines = shapgeo.asLineString(cnts_main)
-    print(cnts_lines.length)
-    print(len(corners))
-    i = 0
-    bw3_rgb = cv2.cvtColor(bw3, cv2.COLOR_GRAY2RGB)
-    for corner in corners:
-        x, y = corner.ravel()
-        rcs = []
-        for corner2 in corners:
-            x2, y2 = corner2.ravel()
-            corner_lines = shapgeo.LineString(((x, y), (x2, y2)))
-            # print(corner_lines)
-            # print(cnts_lines)
-            if not (corner_lines.intersects(cnts_lines)):
-                # print("Valid line found")
-                i = i + 1
-                dy = (y2 - y)
-                dx = (x2 - x)
-                if (dx != 0):
-                    rc = (y2 - y) / (x2 - x)
-                    angle = np.arctan(rc)
-                    # print(angle)
-                    rcs.append(angle)
-                    cv2.line(bw3_rgb, (x, y), (x2, y2), (255, 0, 0))
-                else:
-                    rcs.append(1)
-        # check if it is a corss point
-        if len(rcs) > 0:
-            if (np.sum(angle)) < 1:
-                # print("draw poitn")
-                cv2.circle(bw2_rgb, (x, y), 5, (0, 0, 255), -1)
-                cv2.putText(bw2_rgb, str(np.sum(np.round(angle, 2))), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
-                            (0, 0, 255), 1)
-
-    print(i)
-    cv2.drawContours(bw3_rgb, cnts, -1, (0, 255, 0), 1)
-    cv2.imshow("bw3", bw3_rgb)
-    cv2.imshow('crosses', bw2_rgb)
-    # step three: draw line between points and check if it is between boundry
+    cv2.imshow("roi", ROI_rgb)
+    #cv2.waitKey(4000)
 
 
 
@@ -130,7 +148,7 @@ if __name__ == "__main__":
     bw2 = thinning(bw2)
     cv2.imshow("src", bw)
     minLineLength = bw2.shape[1] - 300
-
+    cv2.imshow("star",bw2)
     lines = cv2.HoughLinesP(bw2, 1, np.pi / 180, 1, 10, 0.5)
 
     print(len(lines[0]))

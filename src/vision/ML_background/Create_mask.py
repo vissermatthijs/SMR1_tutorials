@@ -108,6 +108,7 @@ def back_for_ground_sub(img, sliders):
         # Fill small objects
         device, ab_fill = pcv.fill(ab, ab_cnt, 200, device, debug)  # Original 200 New: 120
         # cv2.imwrite("yucca_1.jpg",s)
+        device, mask_new = pcv.logical_and(maskeda_thresh2, maskedb_thresh, device, debug)
 
         # Apply mask (for vis images, mask_color=white)
         device, masked2 = pcv.apply_mask(masked, ab_fill, 'white', device, debug)
@@ -127,6 +128,7 @@ def back_for_ground_sub(img, sliders):
             cv2.imshow('Green_magenta_dark', maskeda_thresh)
             cv2.imshow('Green_magenta_light', maskeda_thresh1)
             cv2.imshow('Blue_yellow_light', maskedb_thresh)
+            cv2.imshow('Mask', mask_new)
             # cv2.imshow('Mask', masked)
             # cv2.imshow('Mask2', masked2)
             # cv2.imshow('Mask3', masked3)
@@ -155,7 +157,7 @@ def back_for_ground_sub(img, sliders):
 
     # Object combine kept objects
     device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug=False)
-    return device, ab_fill, maskeda_thresh, obj
+    return device, ab_fill, mask_new, obj
 
 
 cv_img = []

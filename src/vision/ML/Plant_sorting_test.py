@@ -454,8 +454,8 @@ cv2.destroyAllWindows()
 # created a *threaded* video stream, allow the camera sensor to warmup,
 # and start the FPS counter
 print("[INFO] sampling THREADED frames from webcam...")
-vs = WebcamVideoStream(src=2, frame_name="top").start()
-vs_2 = WebcamVideoStream(src=3, frame_name="side").start()
+vs = WebcamVideoStream(src=1, frame_name="top").start()
+vs_2 = WebcamVideoStream(src=2, frame_name="side").start()
 #fps = FPS().start()
 
 # stop the timer and display FPS information
@@ -472,7 +472,7 @@ while True:
         print("Height", height)
         info_top = ""
         info_side = ""
-        if height >= 70:
+        if height < 70:
             A, X = get_feature(image_top)
             info_side = info_side + "height = OK"
             if A == 0:
@@ -489,7 +489,7 @@ while True:
             print("error: no plant found side")
             info_side = info_side + "height = -1"
             info_top = info_top + "error"
-        if height < 90:
+        if height > 70:
             print("plant to small")
             info_side = info_side + "height = to small"
             info_top = info_top + "to small"

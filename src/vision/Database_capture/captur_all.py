@@ -7,7 +7,7 @@ cam = cv2.VideoCapture(2)
 cv2.namedWindow("test")
 img_type=""
 img_counter = 0
-waitkey = 0
+waitkey = 1
 
 
 while True:
