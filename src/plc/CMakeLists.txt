@@ -8,7 +8,7 @@ project(plc)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp message_generation
+  roscpp message_generation vision
 )
 
 ## System dependencies are found with CMake's conventions
@@ -105,6 +105,7 @@ catkin_package(
         CATKIN_DEPENDS
         roscpp
         message_runtime
+        vision
         #  DEPENDS system_lib
 )
 

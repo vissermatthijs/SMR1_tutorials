@@ -7,7 +7,7 @@
 
 #include <plc/snap7.h>
 #include <ros/ros.h>
-
+#include <vision/plant_info.h>
 
 
 enum SENSORS {
@@ -34,8 +34,10 @@ private:
     int rack,slot;
 
     ros::Publisher sensor_pub;
+    ros::Subscriber vision_sub;
 
     bool Check(int Result, const char * function);
+    void setSkipPlant(const vision::plant_info::ConstPtr& msg);
 
 
 };
