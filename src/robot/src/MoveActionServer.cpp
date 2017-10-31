@@ -58,14 +58,14 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
             p.position.z -= 0.30f;
             this->planner.manualPose(p);
-            p.position.z -= 0.10f;
+            p.position.z -= 0.09f;
             this->planner.manualPose(p);
 
             p.position.x += 0.15f;
             p.position.y += 0.15f;
             this->planner.manualPose(p);
 
-            p.position.z += 0.40f;
+            p.position.z += 0.39f;
             this->planner.manualPose(p);
 
             counter[1].first++;
@@ -96,13 +96,13 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.10f;
+                p.position.z -= 0.09f;
                 this->planner.manualPose(p);
 
                 p.position.y += 0.15f;
                 this->planner.manualPose(p);
 
-                p.position.z += 0.40f;
+                p.position.z += 0.39f;
                 this->planner.manualPose(p);
 
             } else if(this->middleCounter == 9) {
@@ -114,15 +114,42 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.10f;
+                p.position.z -= 0.09f;
                 this->planner.manualPose(p);
 
                 p.position.y += 0.15f;
                 this->planner.manualPose(p);
 
-                p.position.z += 0.40f;
+                p.position.z += 0.39f;
                 this->planner.manualPose(p);
 
+            } else if(this->middleCounter== 6 || this->middleCounter==7){
+                // achterste row
+                this->planner.manualPose("place_bin2_3");
+                p = this->planner.getCurrentPose();
+
+
+                if(this->middleCounter == 7) {
+                    p.position.y += distance;
+                }
+
+                this->planner.manualPose(p);
+
+                p.position.z -= 0.30f;
+                this->planner.manualPose(p);
+                p.position.z -= 0.05f;
+                this->planner.manualPose(p);
+                p.position.z -= 0.05f;
+                this->planner.manualPose(p);
+
+                //this->planner.pushConstraintFromCurrentOrientation();
+                p.position.x -= 0.125f;
+                p.position.y += 0.125f;
+
+                this->planner.manualPose(p);;
+
+                p.position.z += 0.39f;
+                this->planner.manualPose(p);
             } else if(this->middleCounter % 2 == 0) {
                 // voorste row
                 this->planner.manualPose("place_bin2_1");
@@ -136,13 +163,15 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.10f;
+                p.position.z -= 0.05f;
+                this->planner.manualPose(p);
+                p.position.z -= 0.05f;
                 this->planner.manualPose(p);
 
-                p.position.x -= 0.15f;
+                p.position.x -= 0.125f;
                 this->planner.manualPose(p);
 
-                p.position.z += 0.40f;
+                p.position.z += 0.39f;
                 this->planner.manualPose(p);
             } else {
                 // achterste row
@@ -156,14 +185,17 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.10f;
+                p.position.z -= 0.05f;
+                this->planner.manualPose(p);
+                p.position.z -= 0.05f;
                 this->planner.manualPose(p);
 
                 //this->planner.pushConstraintFromCurrentOrientation();
-                p.position.x -= 0.15f;
+                p.position.x -= 0.125f;
+
                 this->planner.manualPose(p);;
 
-                p.position.z += 0.40f;
+                p.position.z += 0.39f;
                 this->planner.manualPose(p);
             }
 

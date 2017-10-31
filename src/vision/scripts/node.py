@@ -415,12 +415,13 @@ def talker():
     ser = serial.Serial('/dev/ttyACM0', 9600)
 
     print("[INFO] sampling THREADED frames from webcam...")
-    vs = WebcamVideoStream(src=1, frame_name="top").start()
-    vs_2 = WebcamVideoStream(src=2, frame_name="side").start()
+    vs = WebcamVideoStream(src=2, frame_name="top").start()
+    vs_2 = WebcamVideoStream(src=4, frame_name="side").start()
 
     while not rospy.is_shutdown():
 
         if ser.readline() == b'1\r\n':
+            print("Plant triggered")
             # check the height
             image_top = vs.read()
             image_side = vs_2.read()
