@@ -58,7 +58,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
             p.position.z -= 0.30f;
             this->planner.manualPose(p);
-            p.position.z -= 0.09f;
+            p.position.z -= 0.04f;
+            this->planner.manualPose(p);
+            p.position.z -= 0.05f;
             this->planner.manualPose(p);
 
             p.position.x += 0.15f;
@@ -96,7 +98,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.09f;
+                p.position.z -= 0.04f;
+                this->planner.manualPose(p);
+                p.position.z -= 0.05f;
                 this->planner.manualPose(p);
 
                 p.position.y += 0.15f;
@@ -114,7 +118,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
 
                 p.position.z -= 0.30f;
                 this->planner.manualPose(p);
-                p.position.z -= 0.09f;
+                p.position.z -= 0.04f;
+                this->planner.manualPose(p);
+                p.position.z -= 0.05f;
                 this->planner.manualPose(p);
 
                 p.position.y += 0.15f;
@@ -231,7 +237,9 @@ void MoveActionServer::exec(const robot::MovePlantGoalConstPtr &goal) {
             //lower plant
             p.position.z -= 0.30f;
             this->planner.manualPose(p);
-            p.position.z -= 0.10f;
+            p.position.z -= 0.5f;
+            this->planner.manualPose(p);
+            p.position.z -= 0.05f;
             this->planner.manualPose(p);
 
             //remove eoat from plant
