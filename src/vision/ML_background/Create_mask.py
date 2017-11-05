@@ -64,8 +64,8 @@ def back_for_ground_sub(img, sliders):
         # Convert RGB to HSV and extract the Saturation channel
         # Extract the light and dark form the image
         device, s = pcv.rgb2gray_hsv(img, 's', device)
-        # device, s_thresh = pcv.binary_threshold(s, sat_thresh, 255, 'light', device)
-        device, s_thresh = pcv.otsu_auto_threshold(s, 255, 'light', device, debug)
+        device, s_thresh = pcv.binary_threshold(s, sat_thresh, 255, 'light', device)
+        # device, s_thresh = pcv.otsu_auto_threshold(s, 255, 'light', device, debug)
         device, s_mblur = pcv.median_blur(s_thresh, 5, device)
         device, s_cnt = pcv.median_blur(s_thresh, 5, device)
 
@@ -75,7 +75,7 @@ def back_for_ground_sub(img, sliders):
         device, b = pcv.rgb2gray_lab(img, 'b', device)
         device, b_thresh = pcv.otsu_auto_threshold(b, 255, 'light', device, debug)
         device, b_cnt = pcv.otsu_auto_threshold(b, 255, 'light', device, debug)
-        device, b_cnt_2 = pcv.binary_threshold(b, 135, 255, 'light', device, debug)
+        device, b_cnt_2 = pcv.binary_threshold(b, 100, 255, 'light', device, debug)
 
         device, bs = pcv.logical_or(s_mblur, b_cnt, device)
         # Mask the original image with the theshed combination of the blue&saturation
@@ -129,15 +129,15 @@ def back_for_ground_sub(img, sliders):
             cv2.imshow('Green_magenta_light', maskeda_thresh1)
             cv2.imshow('Blue_yellow_light', maskedb_thresh)
             cv2.imshow('Mask', mask_new)
-            # cv2.imshow('Mask', masked)
-            # cv2.imshow('Mask2', masked2)
-            # cv2.imshow('Mask3', masked3)
-            # cv2.imshow('masked_a', masked_a)
-            # cv2.imshow('masked_b', masked_b)
-            # cv2.imshow('fill', ab_fill)
-            # cv2.imshow('ab_cnt', ab)
-            # cv2.imshow('ab1', ab1)
-            # cv2.imshow('ab_cnt2', ab_cnt_2)
+            cv2.imshow('Mask', masked)
+            cv2.imshow('Mask2', masked2)
+            cv2.imshow('Mask3', masked3)
+            cv2.imshow('masked_a', masked_a)
+            cv2.imshow('masked_b', masked_b)
+            cv2.imshow('fill', ab_fill)
+            cv2.imshow('ab_cnt', ab)
+            cv2.imshow('ab1', ab1)
+            cv2.imshow('ab_cnt2', ab_cnt_2)
 
             k = cv2.waitKey(1) & 0xFF
             if k == 27:
@@ -157,7 +157,6 @@ def back_for_ground_sub(img, sliders):
 
     # Object combine kept objects
     device, obj, mask = pcv.object_composition(img, roi_objects, hierarchy3, device, debug=False)
-    return device, ab_fill, s_thresh, obj
 
 
 cv_img = []

@@ -132,6 +132,8 @@ def find_leaves_crosses(bw2):
             # cv2.circle(bw2_rgb, (int(x),int(y)), 3, (255, 255, 0), -1)
     cv2.imshow('key_points', bw2_rgb)
     cv2.imshow("roi", ROI_rgb)
+    cv2.imwrite("key_points.jpg", ROI_rgb)
+    cv2.imwrite("key_points2.jpg", bw2_rgb)
     #cv2.waitKey(4000)
 
 
@@ -140,7 +142,7 @@ def find_leaves_crosses(bw2):
 
 
 if __name__ == "__main__":
-    src = cv2.imread("/home/matthijs/PycharmProjects/SMR1/src/vision/scripts/12_er_image_itr_1.png")
+    src = cv2.imread("/home/matthijs/PycharmProjects/SMR1/src/vision/scripts/5_roi_mask.png")
     if src == None:
         sys.exit()
     bw = cv2.cvtColor(src, cv2.cv.CV_BGR2GRAY)
@@ -161,6 +163,9 @@ if __name__ == "__main__":
 
 
     cv2.imshow("feature_info", src)
+    cv2.imwrite("src.jpg", src)
+    cv2.imwrite("thinning.jpg", bw2)
+    cv2.imwrite("info.jpg", src)
     cv2.imshow("thinning", bw2)
     cv2.waitKey()
     # calculate distance between all points
